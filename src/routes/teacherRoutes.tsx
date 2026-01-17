@@ -10,6 +10,7 @@ import EditStudent from "../pages/teacher/EditStudent";
 import QuizDashboard from "../pages/teacher/QuizDashboard";
 import CreateQuiz from "../pages/teacher/CreateQuiz";
 import QuizSubmissions from "../pages/teacher/QuizSubmissions";
+import TeacherAnnouncements from "../pages/teacher/TeacherAnnouncements";
 
 export const teacherRoutes = (
   <>
@@ -75,6 +76,14 @@ export const teacherRoutes = (
       element={
         <AuthGuard role="teacher">
           <QuizSubmissions />
+        </AuthGuard>
+      }
+    />
+    <Route
+      path="/teacher/announcements"
+      element={
+        <AuthGuard role="teacher">
+          <TeacherAnnouncements />
         </AuthGuard>
       }
     />

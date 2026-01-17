@@ -49,6 +49,7 @@ const EditStudent = () => {
       const formData = new FormData();
       formData.append("name", student.name);
       formData.append("class", student.class);
+      formData.append("branch", student.branch || "");
       formData.append("section", student.section);
       formData.append("registerNo", student.registerNo);
       formData.append("username", student.username);
@@ -148,6 +149,23 @@ const EditStudent = () => {
                         className="h-12 px-4 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Branch
+                      </label>
+                      <input
+                        type="text"
+                        value={student.branch || ""}
+                        onChange={(e) =>
+                          setStudent({ ...student, branch: e.target.value })
+                        }
+                        placeholder="CSE, ECE, MECH, etc."
+                        className="h-12 px-4 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Section

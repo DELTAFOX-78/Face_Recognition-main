@@ -1,4 +1,4 @@
-import { BarChart3, MessageCircle, ClipboardList, History } from 'lucide-react';
+import { BarChart3, MessageCircle, ClipboardList, History, Bell } from 'lucide-react';
 import DashboardLayout from '../../components/layouts/DashboardLayout';
 import { DashboardCard } from '../../components/dashboard';
 
@@ -34,6 +34,13 @@ const StudentDashboard = () => {
             title="Quiz History"
             description="View your past quiz attempts and scores"
             to="/student/quiz-history"
+          />
+
+          <DashboardCard
+            icon={Bell}
+            title="Announcements"
+            description="View announcements from teachers"
+            to="/student/announcements"
           />
         </div>
       </div>

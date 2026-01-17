@@ -43,6 +43,7 @@ const attendanceRecordSchema = new mongoose.Schema(
 const studentSchema = new mongoose.Schema({
   name: { type: String, required: true },
   class: { type: String, required: true },
+  branch: { type: String, required: true },
   section: { type: String, required: true },
   registerNo: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },

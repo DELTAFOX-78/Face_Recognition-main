@@ -12,6 +12,7 @@ import teacherRoutes from "./routes/teacher.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import attendanceRoutes from "./routes/attendanceRoutes.js";
 import quizRoutes from "./routes/quiz.routes.js";
+import announcementRoutes from "./routes/announcement.routes.js";
 
 dotenv.config();
 
@@ -47,6 +48,7 @@ app.use("/api/teacher", teacherRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/quiz", quizRoutes);
+app.use("/api/announcement", announcementRoutes);
 
 // Socket.IO chat implementation
 io.on("connection", (socket) => {

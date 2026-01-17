@@ -35,6 +35,7 @@ export const addStudent = async (req, res) => {
     const {
       name,
       class: className,
+      branch,
       section,
       registerNo,
       username,
@@ -74,6 +75,7 @@ export const addStudent = async (req, res) => {
           registerNo: student.registerNo,
           photo: student.photo,
           class: student.class,
+          branch: student.branch,
           section: student.section,
         },
         exists: true,
@@ -96,6 +98,7 @@ export const addStudent = async (req, res) => {
     student = new Student({
       name,
       class: className,
+      branch,
       section,
       registerNo,
       username,
@@ -119,6 +122,7 @@ export const addStudent = async (req, res) => {
         registerNo: student.registerNo,
         photo: student.photo,
         class: student.class,
+        branch: student.branch,
         section: student.section,
       },
       exists: false,
@@ -130,6 +134,10 @@ export const addStudent = async (req, res) => {
 };
 
 let isCapturing = false;
+let currentAttendanceSession = {
+  class: null,
+  section: null,
+};
 
 export const markAttendance = async (req, res) => {
   try {
@@ -139,8 +147,22 @@ export const markAttendance = async (req, res) => {
         .json({ message: "Attendance capture already running" });
     }
 
+    const { class: className, section } = req.body;
+
+    if (!className || !section) {
+      return res
+        .status(400)
+        .json({ message: "Class and section are required" });
+    }
+
     const teacher = await Teacher.findById(req.user.id);
     const sub = teacher.subject;
+
+    // Store current session info
+    currentAttendanceSession = {
+      class: className,
+      section: section,
+    };
 
     isCapturing = true;
     io.emit("capture-status", { capturing: true });
@@ -149,13 +171,15 @@ export const markAttendance = async (req, res) => {
     runPythonScripts(sub).catch((error) => {
       console.error("Error in Python process:", error);
       isCapturing = false;
+      currentAttendanceSession = { class: null, section: null };
       io.emit("error", error.message);
       io.emit("capture-status", { capturing: false });
     });
 
-    res.json({ message: "Attendance capture started" });
+    res.json({ message: `Attendance capture started for ${className} - Section ${section}` });
   } catch (error) {
     isCapturing = false;
+    currentAttendanceSession = { class: null, section: null };
     res.status(500).json({ message: "Failed to start attendance capture" });
   }
 };
@@ -165,13 +189,28 @@ export const stopAttendance = async (req, res) => {
     if (!isCapturing) {
       return res.status(400).json({ message: "No capture process running" });
     }
-    const teacher = await Teacher.findById(req.user.id);
-    const students = teacher.students;
-    const stopped = stopPythonScript(students, teacher.subject);
+
+    const teacher = await Teacher.findById(req.user.id).populate('students');
+
+    // Filter students by the selected class and section
+    const filteredStudents = teacher.students
+      .filter(student =>
+        student.class === currentAttendanceSession.class &&
+        student.section === currentAttendanceSession.section
+      )
+      .map(student => student._id);
+
+    const stopped = await stopPythonScript(filteredStudents, teacher.subject);
+
     isCapturing = false;
+    const sessionInfo = `${currentAttendanceSession.class} - Section ${currentAttendanceSession.section}`;
+    currentAttendanceSession = { class: null, section: null };
+
     io.emit("capture-status", { capturing: false });
     res.json({
-      message: stopped ? "Capture stopped successfully" : "No process to stop",
+      message: stopped
+        ? `Capture stopped successfully for ${sessionInfo}`
+        : "No process to stop",
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to stop capture" });
@@ -181,15 +220,30 @@ export const stopAttendance = async (req, res) => {
 export const downloadAttendanceReport = async (req, res) => {
   try {
     const teacherId = req.user.id;
-    const { date } = req.query;
+    const { date, branch, class: className, section } = req.query;
+
     // Get all students for this teacher
     const teacher = await Teacher.findById(teacherId).populate("students");
 
-    // Get attendance records for these students
+    // Filter students based on provided filters
+    let filteredStudents = teacher.students;
+    if (branch) {
+      filteredStudents = filteredStudents.filter(s => s.branch === branch);
+    }
+    if (className) {
+      filteredStudents = filteredStudents.filter(s => s.class === className);
+    }
+    if (section) {
+      filteredStudents = filteredStudents.filter(s => s.section === section);
+    }
+
+    const studentIds = filteredStudents.map(s => s._id);
+
+    // Get attendance records for filtered students
     const attendanceRecords = await Student.aggregate([
       {
         $match: {
-          _id: { $in: teacher.students },
+          _id: { $in: studentIds },
         },
       },
       {
@@ -204,6 +258,7 @@ export const downloadAttendanceReport = async (req, res) => {
         $project: {
           name: 1,
           class: 1,
+          branch: 1,
           section: 1,
           registerNo: 1,
           "attendance.date": 1,
@@ -244,6 +299,7 @@ export const updateStudent = async (req, res) => {
     const {
       name,
       class: className,
+      branch,
       section,
       registerNo,
       username,
@@ -255,6 +311,7 @@ export const updateStudent = async (req, res) => {
       {
         name,
         class: className,
+        branch,
         section,
         registerNo,
         username,
@@ -332,3 +389,53 @@ export const getTeacherClasses = async (req, res) => {
     res.status(500).json({ message: "Error fetching classes" });
   }
 };
+
+export const getTeacherBranchClassSection = async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+    const teacher = await Teacher.findById(teacherId).populate('students', 'branch class section');
+
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    // Build nested structure: branch -> class -> sections
+    const branchMap = new Map(); // branch -> Map(class -> Set(sections))
+
+    teacher.students.forEach(student => {
+      if (student.branch && student.class && student.section) {
+        if (!branchMap.has(student.branch)) {
+          branchMap.set(student.branch, new Map());
+        }
+        const classMap = branchMap.get(student.branch);
+        if (!classMap.has(student.class)) {
+          classMap.set(student.class, new Set());
+        }
+        classMap.get(student.class).add(student.section);
+      }
+    });
+
+    // Convert to array structure for frontend
+    const result = [];
+    branchMap.forEach((classMap, branch) => {
+      const classes = [];
+      classMap.forEach((sections, className) => {
+        classes.push({
+          className,
+          sections: Array.from(sections).sort()
+        });
+      });
+      classes.sort((a, b) => a.className.localeCompare(b.className));
+      result.push({ branch, classes });
+    });
+
+    // Sort by branch name
+    result.sort((a, b) => a.branch.localeCompare(b.branch));
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error fetching branch/class/section:", error);
+    res.status(500).json({ message: "Error fetching filter options" });
+  }
+};
+

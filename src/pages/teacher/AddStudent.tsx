@@ -19,6 +19,7 @@ interface Student {
   name: string;
   photo: string;
   class: string;
+  branch: string;
   section: string;
   registerNo: string;
   username: string;
@@ -29,6 +30,7 @@ const AddStudent = () => {
   const [formData, setFormData] = useState({
     name: "",
     class: "",
+    branch: "",
     section: "",
     registerNo: "",
     username: "",
@@ -155,7 +157,7 @@ const AddStudent = () => {
               {/* Class Field */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Branch
+                  Class
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -166,7 +168,27 @@ const AddStudent = () => {
                     name="class"
                     required
                     className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="CSE"
+                    placeholder="1st Year, 2nd Year, etc."
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Branch Field */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Branch
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <BookOpen className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="branch"
+                    required
+                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder="CSE, ECE, MECH, etc."
                     onChange={handleChange}
                   />
                 </div>

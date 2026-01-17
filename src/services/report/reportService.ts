@@ -4,13 +4,44 @@ import { downloadBlob } from "./utils";
 import { handleApiError } from "../../utils/errorHandling";
 import { showNotification } from "../../utils/notification/notification.ts";
 
-class ReportService {
-  // private readonly BASE_URL = `/teacher/attendance-report`;
+export interface FilterClass {
+  className: string;
+  sections: string[];
+}
 
-  async downloadAttendanceReport(date: string): Promise<void> {
+export interface FilterOption {
+  branch: string;
+  classes: FilterClass[];
+}
+
+export interface ReportFilters {
+  date: string;
+  branch?: string;
+  class?: string;
+  section?: string;
+}
+
+class ReportService {
+  async getFilterOptions(): Promise<FilterOption[]> {
     try {
+      const response = await api.get<FilterOption[]>('/teacher/filter-options');
+      return response.data;
+    } catch (error) {
+      handleApiError(error, "Failed to fetch filter options");
+      throw error;
+    }
+  }
+
+  async downloadAttendanceReport(filters: ReportFilters): Promise<void> {
+    try {
+      const params = new URLSearchParams();
+      params.append('date', filters.date);
+      if (filters.branch) params.append('branch', filters.branch);
+      if (filters.class) params.append('class', filters.class);
+      if (filters.section) params.append('section', filters.section);
+
       const response: AxiosResponse<Blob> = await api.get<Blob>(
-        `/teacher/attendance-report?date=${date}`,
+        `/teacher/attendance-report?${params.toString()}`,
         {
           responseType: "blob",
           headers: {
@@ -19,7 +50,7 @@ class ReportService {
           },
         }
       );
-      const filename = `attendance_report_${date}.xlsx`;
+      const filename = `attendance_report_${filters.date}.xlsx`;
 
       const blob = new Blob([response.data], {
         type: response.headers["content-type"],
@@ -32,12 +63,7 @@ class ReportService {
       throw error;
     }
   }
-
-  // private async fetchReport(): Promise<DownloadResponse> {
-  //   return api.get(this.BASE_URL, {
-  //     responseType: 'blob'
-  //   });
-  // }
 }
 
 export const reportService = new ReportService();
+

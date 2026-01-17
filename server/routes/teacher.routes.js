@@ -15,6 +15,7 @@ import {
   updateStudent,
   deleteStudent,
   getTeacherClasses,
+  getTeacherBranchClassSection,
 } from "../controllers/teacher.controller.js";
 import path from "path";
 
@@ -37,6 +38,7 @@ router.post("/mark-attendance", verifyToken, markAttendance);
 router.get("/attendance-report", verifyToken, downloadAttendanceReport);
 router.post("/stop-attendance", verifyToken, stopAttendance);
 router.get("/classes", verifyToken, getTeacherClasses);
+router.get("/filter-options", verifyToken, getTeacherBranchClassSection);
 // Add this new route to existing routes
 router.get("/students", verifyToken, async (req, res) => {
   try {

@@ -28,7 +28,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
             <h3 className="text-lg font-semibold">{student.name}</h3>
             <p className="text-sm text-gray-500">#{student.registerNo}</p>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              {student.class}-{student.section}
+              {student.branch}-{student.section}
             </span>
           </div>
         </div>

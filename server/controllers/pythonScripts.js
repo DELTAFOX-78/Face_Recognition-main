@@ -19,9 +19,16 @@ async function executePythonScript(scriptPath, processOutput = false, sub) {
     if (processOutput) {
       pythonProcess.stdout.on("data", async (data) => {
         try {
-          const registerNo = data.toString().trim();
+          const output = data.toString().trim();
 
-          const student = await Student.findOne({ registerNo });
+          // Only process if it looks like a register number (alphanumeric, typically 8-15 chars)
+          // Skip Python code output, debug messages, etc.
+          if (!output || output.includes('(') || output.includes('=') ||
+            output.includes('[') || output.includes('{') || output.length > 20) {
+            return; // Skip non-register number output
+          }
+
+          const student = await Student.findOne({ registerNo: output });
           if (student) {
             present_students.push(student._id.toString());
             io.emit(
@@ -42,27 +49,51 @@ async function executePythonScript(scriptPath, processOutput = false, sub) {
               present: true,
             });
             await student.save();
-          } else {
-            io.emit("error", "Fake face detected");
           }
+          // Removed "Fake face detected" error - if no student found, just ignore
         } catch (error) {
-          io.emit(
-            "error",
-            error.message.toString().length > 100 ? "" : error.message
-          );
+          // Silently ignore parsing errors
+          console.error("Error processing stdout:", error.message);
         }
       });
     }
 
     pythonProcess.stderr.on("data", (data) => {
-      if (!(data.toString().length > 100)) {
-        io.emit("error", data.toString());
+      const errorMsg = data.toString();
+      // Filter out common Python library warnings, internal messages, and code output
+      const ignoredPatterns = [
+        'zipfile',
+        'DeprecationWarning',
+        'UserWarning',
+        'FutureWarning',
+        'RuntimeWarning',
+        'numpy',
+        'np.',
+        'tensorflow',
+        'dlib',
+        'cv2',
+        'face_recognition',
+        'savez',
+        'encodings',
+        'import',
+        'from',
+        '.py',
+        'Traceback',
+        'File "'
+      ];
+      const shouldIgnore = ignoredPatterns.some(pattern =>
+        errorMsg.toLowerCase().includes(pattern.toLowerCase())
+      );
+
+      if (!shouldIgnore && errorMsg.length <= 100 && errorMsg.trim().length > 0) {
+        io.emit("error", errorMsg);
       }
     });
 
     pythonProcess.on("close", (code) => {
       if (count == 1) {
-        io.emit("process-ended", `Images Loaded Successfully`);
+        // Use 'status-update' instead of 'process-ended' to avoid disabling Stop button
+        io.emit("status-update", `Images Loaded Successfully`);
       }
 
       pythonProcess = null;

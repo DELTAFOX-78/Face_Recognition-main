@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserPlus, Camera, Download, MessageCircle, Users } from "lucide-react";
+import { UserPlus, Camera, Download, MessageCircle, Users, Bell } from "lucide-react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { DashboardCard } from "../../components/dashboard";
 import { reportService } from "../../services/report/reportService";
@@ -9,9 +9,9 @@ import DateRangeModal from "../../components/attendance/DateRangeModal";
 const TeacherDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDownloadReport = async (date: string) => {
+  const handleDownloadReport = async (filters: { date: string; branch: string; class: string; section: string }) => {
     try {
-      await reportService.downloadAttendanceReport(date);
+      await reportService.downloadAttendanceReport(filters);
     } catch (error) {
       handleApiError(error);
     }
@@ -66,6 +66,12 @@ const TeacherDashboard = () => {
             title="Create Quiz"
             description="Create a new quiz"
             to="/teacher/quizzes"
+          />
+          <DashboardCard
+            icon={Bell}
+            title="Announcements"
+            description="Send announcements to students"
+            to="/teacher/announcements"
           />
         </div>
       </div>
