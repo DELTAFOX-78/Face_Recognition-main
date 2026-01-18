@@ -1,0 +1,82 @@
+[
+    {
+        "question": "What is Serializability in the context of transactions?",
+        "options": [
+            "A) The concept used to determine whether a schedule with interleaving operations is correct",
+            "B) A type of transaction that can be committed or aborted",
+            "C) A database operation that allows data retrieval and update",
+            "D) A system component responsible for tracking transactions"
+        ],
+        "correct_answer": "A"
+    },
+    {
+        "question": "What happens to a transaction's operations when it is interrupted?",
+        "options": [
+            "A) The operations are permanently saved to the database",
+            "B) The operations are undone and not saved",
+            "C) The system starts tracking the transaction's execution",
+            "D) The transaction can be committed or aborted"
+        ],
+        "correct_answer": "B"
+    },
+    {
+        "question": "What is the purpose of the BEGIN_TRANSACTION operation?",
+        "options": [
+            "A) To mark the end of a transaction",
+            "B) To signal that a transaction has been successfully completed",
+            "C) To allow data retrieval and update operations",
+            "D) To start tracking a transaction's execution"
+        ],
+        "correct_answer": "D"
+    },
+    {
+        "question": "What happens to a transaction after the END_TRANSACTION operation?",
+        "options": [
+            "A) The system decides whether to commit or abort the transaction",
+            "B) The transaction is permanently saved to the database",
+            "C) The transaction must be undone and not saved",
+            "D) The system starts tracking the transaction's execution"
+        ],
+        "correct_answer": "A"
+    },
+    {
+        "question": "What is the purpose of the COMMITTRANSACTION operation?",
+        "options": [
+            "A) To mark the end of a transaction",
+            "B) To signal that a transaction has been successfully completed and its operations are saved",
+            "C) To allow data retrieval and update operations",
+            "D) To start tracking a transaction's execution"
+        ],
+        "correct_answer": "B"
+    },
+    {
+        "question": "Why is Serializability Important?",
+        "options": [
+            "A) Because it allows for non-serial schedules",
+            "B) Because it ensures that transactions are executed in a predictable order",
+            "C) Because it provides better performance and efficiency",
+            "D) Because it guarantees the consistency of data"
+        ],
+        "correct_answer": "D"
+    },
+    {
+        "question": "What happens to a transaction's operations when the DBMS allows interleaving?",
+        "options": [
+            "A) The operations are executed in a serial order",
+            "B) The operations can overlap and vary in execution order",
+            "C) The system starts tracking the transaction's execution",
+            "D) The transaction is permanently saved to the database"
+        ],
+        "correct_answer": "B"
+    },
+    {
+        "question": "What is an example of a non-serial schedule?",
+        "options": [
+            "A) T1 followed by T2",
+            "B) T2 followed by T1",
+            "C) Both T1 and T2 executed concurrently with no overlap",
+            "D) Neither T1 nor T2 is executed"
+        ],
+        "correct_answer": "B"
+    }
+]
