@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UserPlus, Camera, Download, MessageCircle, Users, Bell } from "lucide-react";
+import { UserPlus, Camera, Download, MessageCircle, Users, Bell, ClipboardList, LayoutDashboard } from "lucide-react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { DashboardCard } from "../../components/dashboard";
 import { reportService } from "../../services/report/reportService";
@@ -19,8 +19,19 @@ const TeacherDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+      <div className="space-y-8">
+        {/* Header Section */}
+        <div className="flex items-center space-x-4">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200/50">
+            <LayoutDashboard className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">Dashboard</h2>
+            <p className="text-gray-500">Manage your classroom and students</p>
+          </div>
+        </div>
+
+        {/* Dashboard Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <DashboardCard
             icon={UserPlus}
@@ -62,7 +73,7 @@ const TeacherDashboard = () => {
             to="/teacher/chat"
           />
           <DashboardCard
-            icon={MessageCircle}
+            icon={ClipboardList}
             title="Create Quiz"
             description="Create a new quiz"
             to="/teacher/quizzes"

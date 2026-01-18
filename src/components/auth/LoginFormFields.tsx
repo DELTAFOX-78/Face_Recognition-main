@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, KeyRound } from "lucide-react";
+import { User, KeyRound, ArrowRight } from "lucide-react";
 import { FormField } from "./FormField";
 
 interface LoginFormFieldsProps {
@@ -19,7 +19,7 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
 
   return (
     <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
-      <div className="space-y-4">
+      <div className="space-y-5">
         <FormField
           id="username"
           name="username"
@@ -27,7 +27,7 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
           label="Username"
           value={username}
           onChange={setUsername}
-          icon={<User className="h-5 w-5 text-gray-400" />}
+          icon={<User className="h-5 w-5 text-indigo-400" />}
         />
 
         <FormField
@@ -37,15 +37,17 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
           label="Password"
           value={password}
           onChange={setPassword}
-          icon={<KeyRound className="h-5 w-5 text-gray-400" />}
+          icon={<KeyRound className="h-5 w-5 text-indigo-400" />}
         />
       </div>
 
+      {/* Submit Button */}
       <button
         type="submit"
-        className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150"
+        className="group relative w-full flex items-center justify-center py-4 px-6 border border-transparent text-base font-semibold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-indigo-300/40 hover:shadow-xl hover:shadow-indigo-300/50"
       >
-        Sign in
+        <span>Sign in</span>
+        <ArrowRight className="ml-2 h-5 w-5 transform group-hover:translate-x-1 transition-transform duration-300" />
       </button>
     </form>
   );

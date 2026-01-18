@@ -10,6 +10,7 @@ import {
   UserPlus,
   Lock,
   Camera,
+  ArrowLeft,
 } from "lucide-react";
 import api from "../../utils/api.ts";
 import { showNotification } from "../../utils/notification/notification.ts";
@@ -114,183 +115,129 @@ const AddStudent = () => {
     }
   };
 
+  const InputField = ({
+    icon: Icon,
+    label,
+    name,
+    type = "text",
+    placeholder,
+    required = true
+  }: {
+    icon: React.ElementType;
+    label: string;
+    name: string;
+    type?: string;
+    placeholder: string;
+    required?: boolean;
+  }) => (
+    <div className="space-y-2">
+      <label className="block text-sm font-semibold text-gray-700">
+        {label}
+      </label>
+      <div className="relative group">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+        </div>
+        <input
+          type={type}
+          name={name}
+          required={required}
+          className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+          placeholder={placeholder}
+          onChange={handleChange}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <div className="flex items-center space-x-4 mb-8">
-            <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
-              <UserPlus className="h-6 w-6 text-indigo-600" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Add New Student
-              </h2>
-              <p className="text-gray-500">
-                Enter student details to create a new account
-              </p>
-            </div>
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center space-x-4">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200/50">
+            <UserPlus className="h-7 w-7 text-white" />
           </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">
+              Add New Student
+            </h2>
+            <p className="text-gray-500">
+              Enter student details to create a new account
+            </p>
+          </div>
+        </div>
 
+        {/* Form Card */}
+        <div className="glass-card p-8 animate-fade-in">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Name Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="John Doe"
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* Class Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Class
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <BookOpen className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="class"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="1st Year, 2nd Year, etc."
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* Branch Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Branch
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <BookOpen className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="branch"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="CSE, ECE, MECH, etc."
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* Section Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Section
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Users className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="section"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="A"
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* Register Number Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Register Number
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Hash className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="registerNo"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="RVCE24BCS___"
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* Username Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="username"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="johndoe"
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-
-              {/* Password Field */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="password"
-                    name="password"
-                    required
-                    className="pl-10 block w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    placeholder="••••••••"
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+              <InputField
+                icon={User}
+                label="Full Name"
+                name="name"
+                placeholder="John Doe"
+              />
+              <InputField
+                icon={BookOpen}
+                label="Class"
+                name="class"
+                placeholder="1st Year, 2nd Year, etc."
+              />
+              <InputField
+                icon={BookOpen}
+                label="Branch"
+                name="branch"
+                placeholder="CSE, ECE, MECH, etc."
+              />
+              <InputField
+                icon={Users}
+                label="Section"
+                name="section"
+                placeholder="A"
+              />
+              <InputField
+                icon={Hash}
+                label="Register Number"
+                name="registerNo"
+                placeholder="RVCE24BCS___"
+              />
+              <InputField
+                icon={User}
+                label="Username"
+                name="username"
+                placeholder="johndoe"
+              />
+              <InputField
+                icon={Lock}
+                label="Password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+              />
             </div>
 
             {/* Photo Upload Section */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-gray-700">
                 Student Photo
               </label>
-              <div className="mt-1 flex items-center space-x-4">
+              <div className="mt-2 flex items-center space-x-6">
                 <div className="flex-shrink-0">
                   {preview ? (
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="h-24 w-24 rounded-lg object-cover"
-                    />
+                    <div className="relative group">
+                      <img
+                        src={preview}
+                        alt="Preview"
+                        className="h-28 w-28 rounded-2xl object-cover ring-4 ring-white shadow-lg"
+                      />
+                      <div className="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                        <Camera className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
                   ) : (
-                    <div className="h-24 w-24 rounded-lg bg-gray-100 flex items-center justify-center">
-                      <Camera className="h-8 w-8 text-gray-400" />
+                    <div className="h-28 w-28 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center border-2 border-dashed border-gray-300">
+                      <Camera className="h-10 w-10 text-gray-400" />
                     </div>
                   )}
                 </div>
@@ -301,18 +248,18 @@ const AddStudent = () => {
                     accept="image/*"
                     required
                     onChange={handleChange}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-indigo-50 file:to-purple-50 file:text-indigo-700 hover:file:from-indigo-100 hover:file:to-purple-100 file:cursor-pointer file:transition-all file:duration-200"
                   />
                   <p className="mt-2 text-sm text-gray-500">
-                    Upload a clear photo of the student. JPG, PNG formats
-                    accepted.
+                    Upload a clear photo of the student. JPG, PNG formats accepted.
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded">
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-xl animate-slide-down">
                 <div className="flex">
                   <div className="flex-shrink-0">
                     <svg
@@ -328,23 +275,25 @@ const AddStudent = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
+                    <p className="text-sm text-red-700 font-medium">{error}</p>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="flex justify-end space-x-4">
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-4 pt-4">
               <button
                 type="button"
                 onClick={() => navigate("/teacher/dashboard")}
-                className="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group flex items-center space-x-2 px-6 py-3 border-2 border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 focus:outline-none focus:ring-4 focus:ring-gray-200/50 transition-all duration-200"
               >
-                Cancel
+                <ArrowLeft className="h-4 w-4 transform group-hover:-translate-x-1 transition-transform duration-200" />
+                <span>Cancel</span>
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-indigo-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 border border-transparent rounded-xl text-sm font-semibold text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/30 shadow-lg shadow-indigo-300/40 hover:shadow-xl hover:shadow-indigo-300/50 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
               >
                 Add Student
               </button>

@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import api from "../../utils/api";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, AlertCircle } from "lucide-react";
+import { Check, AlertCircle, Camera, Info, Play, Square } from "lucide-react";
 import { showNotification } from "../../utils/notification/notification.ts";
 
 interface LogItemProps {
@@ -19,7 +19,7 @@ interface ClassInfo {
 const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
   const variants = {
     initial: {
-      x: -100,
+      x: -20,
       opacity: 0,
     },
     animate: {
@@ -31,9 +31,42 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
       },
     },
     exit: {
-      x: 100,
+      x: 20,
       opacity: 0,
     },
+  };
+
+  const getStyles = () => {
+    switch (type) {
+      case "success":
+        return "bg-emerald-50/80 border-emerald-500 backdrop-blur-sm";
+      case "error":
+        return "bg-red-50/80 border-red-500 backdrop-blur-sm";
+      default:
+        return "bg-blue-50/80 border-blue-500 backdrop-blur-sm";
+    }
+  };
+
+  const getIcon = () => {
+    switch (type) {
+      case "success":
+        return <Check className="w-5 h-5 text-emerald-500" />;
+      case "error":
+        return <AlertCircle className="w-5 h-5 text-red-500" />;
+      default:
+        return <Info className="w-5 h-5 text-blue-500" />;
+    }
+  };
+
+  const getTextColor = () => {
+    switch (type) {
+      case "success":
+        return "text-emerald-700";
+      case "error":
+        return "text-red-700";
+      default:
+        return "text-blue-700";
+    }
   };
 
   return (
@@ -42,42 +75,23 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
       initial="initial"
       animate="animate"
       exit="exit"
-      className={`flex items-center justify-between p-3 mb-2 rounded-lg shadow-sm
-        ${type === "success"
-          ? "bg-green-50 border-l-4 border-green-500"
-          : type === "error"
-            ? "bg-red-50 border-l-4 border-red-500"
-            : "bg-gray-50 border-l-4 border-blue-500"
-        }`}
+      className={`flex items-center justify-between p-4 mb-3 rounded-xl border-l-4 ${getStyles()}`}
     >
       <div className="flex items-center space-x-3">
-        {type === "success" ? (
-          <Check className="w-5 h-5 text-green-500" />
-        ) : type === "error" ? (
-          <AlertCircle className="w-5 h-5 text-red-500" />
-        ) : null}
-        <span
-          className={`text-sm ${type === "success"
-            ? "text-green-700"
-            : type === "error"
-              ? "text-red-700"
-              : "text-gray-700"
-            }`}
-        >
+        {getIcon()}
+        <span className={`text-sm font-medium ${getTextColor()}`}>
           {message}
         </span>
       </div>
       {type === "success" && (
-        <div className="flex items-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="flex items-center px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full"
-          >
-            <Check className="w-3 h-3 mr-1" />
-            Marked
-          </motion.div>
-        </div>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="flex items-center px-3 py-1 text-xs font-semibold text-emerald-700 bg-emerald-100 rounded-full"
+        >
+          <Check className="w-3 h-3 mr-1" />
+          Marked
+        </motion.div>
       )}
     </motion.div>
   );
@@ -217,20 +231,31 @@ const MarkAttendance = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-6">Mark Attendance</h2>
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="max-w-3xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center space-x-4">
+          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-200/50">
+            <Camera className="h-7 w-7 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800">Mark Attendance</h2>
+            <p className="text-gray-500">Use AI-powered face recognition</p>
+          </div>
+        </div>
+
+        {/* Main Card */}
+        <div className="glass-card p-8 animate-fade-in">
           {/* Class and Section Selectors */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
                 Select Class
               </label>
               <select
                 value={selectedClass}
                 onChange={(e) => setSelectedClass(e.target.value)}
                 disabled={capturing}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="select-modern"
               >
                 <option value="">-- Select Class --</option>
                 {classes.map((cls) => (
@@ -240,15 +265,15 @@ const MarkAttendance = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
                 Select Section
               </label>
               <select
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
                 disabled={!selectedClass || capturing}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="select-modern"
               >
                 <option value="">-- Select Section --</option>
                 {availableSections.map((section) => (
@@ -260,49 +285,80 @@ const MarkAttendance = () => {
             </div>
           </div>
 
-          {/* Attendance Buttons */}
-          <div className="flex gap-4 mb-4">
+          {/* Action Buttons */}
+          <div className="flex gap-4 mb-8">
             <button
               onClick={capture}
               disabled={!canStartAttendance}
-              className={`flex-1 py-2 px-4 text-white rounded-md transition-colors ${canStartAttendance
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "bg-indigo-300 cursor-not-allowed"
+              className={`flex-1 flex items-center justify-center space-x-2 py-4 px-6 rounded-xl font-semibold text-white transition-all duration-300 ${canStartAttendance
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-300/40 hover:shadow-xl hover:shadow-indigo-300/50 transform hover:scale-[1.02]"
+                  : "bg-gray-300 cursor-not-allowed"
                 }`}
             >
-              {capturing ? "Processing..." : "Start Attendance"}
+              <Play className="h-5 w-5" />
+              <span>{capturing ? "Processing..." : "Start Attendance"}</span>
             </button>
             <button
               onClick={stopCapture}
               disabled={!capturing}
-              className={`flex-1 py-2 px-4 text-white rounded-md transition-colors ${capturing
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-red-300 cursor-not-allowed"
+              className={`flex-1 flex items-center justify-center space-x-2 py-4 px-6 rounded-xl font-semibold text-white transition-all duration-300 ${capturing
+                  ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 shadow-lg shadow-red-300/40 hover:shadow-xl hover:shadow-red-300/50 transform hover:scale-[1.02]"
+                  : "bg-gray-300 cursor-not-allowed"
                 }`}
             >
-              Stop Attendance
+              <Square className="h-5 w-5" />
+              <span>Stop Attendance</span>
             </button>
           </div>
 
+          {/* Status Indicator */}
+          {capturing && (
+            <div className="mb-6 flex items-center justify-center space-x-3 p-4 rounded-xl bg-indigo-50/80 border border-indigo-200">
+              <div className="relative">
+                <div className="h-3 w-3 rounded-full bg-indigo-500 animate-pulse" />
+                <div className="absolute inset-0 h-3 w-3 rounded-full bg-indigo-400 animate-ping" />
+              </div>
+              <span className="text-sm font-medium text-indigo-700">
+                Camera is active - Recognizing faces...
+              </span>
+            </div>
+          )}
+
           {/* Logs Display */}
-          <div
-            ref={logsContainerRef}
-            className="mt-4 p-4 bg-gray-50 rounded-md h-[400px] overflow-y-auto"
-          >
-            <AnimatePresence mode="popLayout">
-              {logs.map((log, index) => (
-                <LogItem key={index} message={log.message} type={log.type} />
-              ))}
-            </AnimatePresence>
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-gray-700">Activity Log</h3>
+            <div
+              ref={logsContainerRef}
+              className="p-4 bg-gray-50/80 rounded-xl h-[350px] overflow-y-auto custom-scrollbar border border-gray-100"
+            >
+              <AnimatePresence mode="popLayout">
+                {logs.length > 0 ? (
+                  logs.map((log, index) => (
+                    <LogItem key={index} message={log.message} type={log.type} />
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <Camera className="h-12 w-12 mb-3 opacity-50" />
+                    <p className="text-sm">No activity yet</p>
+                    <p className="text-xs">Start attendance to see recognition logs</p>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
+          {/* Result Message */}
           {result && (
-            <div
-              className={`mt-4 p-4 rounded-md ${result.includes("Failed") ? "bg-red-100" : "bg-green-100"
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`mt-6 p-4 rounded-xl font-medium ${result.includes("Failed")
+                  ? "bg-red-50 text-red-700 border border-red-200"
+                  : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                 }`}
             >
               {result}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
