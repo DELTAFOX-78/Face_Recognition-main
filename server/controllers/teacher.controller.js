@@ -41,6 +41,7 @@ export const addStudent = async (req, res) => {
       registerNo,
       username,
       password,
+      mobileNumber,
     } = req.body;
     const photo = req.file?.path;
 
@@ -103,6 +104,7 @@ export const addStudent = async (req, res) => {
         username,
         password: hashedPassword,
         photo,
+        mobileNumber,
         teachers: [req.user.id],
       });
 
@@ -138,6 +140,7 @@ export const addStudent = async (req, res) => {
         class: className,
         branch: branch,
         section: section,
+        mobileNumber: student.mobileNumber,
       },
       exists: !isNewStudent,
     });
@@ -362,6 +365,7 @@ export const getStudentById = async (req, res) => {
       class: enrollment ? enrollment.class : student.class,
       branch: enrollment ? enrollment.branch : student.branch,
       section: enrollment ? enrollment.section : student.section,
+      mobileNumber: student.mobileNumber,
       attendance: student.attendance,
       enrollmentId: enrollment ? enrollment._id : null,
     });
@@ -383,9 +387,10 @@ export const updateStudent = async (req, res) => {
       registerNo,
       username,
       photo,
+      mobileNumber,
     } = req.body;
 
-    // Update student's basic info (name, registerNo, username, photo)
+    // Update student's basic info (name, registerNo, username, photo, mobileNumber)
     const student = await Student.findByIdAndUpdate(
       studentId,
       {
@@ -393,6 +398,7 @@ export const updateStudent = async (req, res) => {
         registerNo,
         username,
         photo: req.file ? req.file.filename : photo,
+        mobileNumber,
       },
       { new: true }
     );
@@ -415,6 +421,7 @@ export const updateStudent = async (req, res) => {
       registerNo: student.registerNo,
       username: student.username,
       photo: student.photo,
+      mobileNumber: student.mobileNumber,
       class: enrollment ? enrollment.class : className,
       branch: enrollment ? enrollment.branch : branch,
       section: enrollment ? enrollment.section : section,

@@ -1,6 +1,7 @@
 import { spawn } from "child_process";
 import Student from "../models/Student.js";
 import { io } from "../index.js";
+import { sendAttendanceSMS } from "../services/smsService.js";
 
 let pythonProcess = null;
 let count = 0;
@@ -49,6 +50,19 @@ async function executePythonScript(scriptPath, processOutput = false, sub) {
               present: true,
             });
             await student.save();
+
+            // Send SMS notification for present attendance
+            if (student.mobileNumber) {
+              sendAttendanceSMS(
+                student.mobileNumber,
+                student.name,
+                sub,
+                formattedDate,
+                "Present"
+              ).catch(err => {
+                console.error(`Failed to send SMS to ${student.name}:`, err.message);
+              });
+            }
           }
           // Removed "Fake face detected" error - if no student found, just ignore
         } catch (error) {
@@ -132,6 +146,19 @@ export const stopPythonScript = async (students, sub) => {
               "process-ended",
               `Attendance marked as Absent for: ${student.name}`
             );
+
+            // Send SMS notification for absent attendance
+            if (student.mobileNumber) {
+              sendAttendanceSMS(
+                student.mobileNumber,
+                student.name,
+                sub,
+                formattedDate,
+                "Absent"
+              ).catch(err => {
+                console.error(`Failed to send SMS to ${student.name}:`, err.message);
+              });
+            }
           }
         }
       })

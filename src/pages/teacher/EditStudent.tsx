@@ -53,6 +53,7 @@ const EditStudent = () => {
       formData.append("section", student.section);
       formData.append("registerNo", student.registerNo);
       formData.append("username", student.username);
+      formData.append("mobileNumber", student.mobileNumber || "");
       if (photoFile) {
         formData.append("photo", photoFile);
       }
@@ -208,6 +209,21 @@ const EditStudent = () => {
                         className="h-12 px-4 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Mobile Number
+                    </label>
+                    <input
+                      type="text"
+                      value={student.mobileNumber || ""}
+                      onChange={(e) =>
+                        setStudent({ ...student, mobileNumber: e.target.value })
+                      }
+                      placeholder="10-digit mobile number"
+                      className="h-12 px-4 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                   </div>
                 </div>
               </div>

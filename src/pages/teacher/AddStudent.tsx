@@ -11,6 +11,7 @@ import {
   Lock,
   Camera,
   ArrowLeft,
+  Phone,
 } from "lucide-react";
 import api from "../../utils/api.ts";
 import { showNotification } from "../../utils/notification/notification.ts";
@@ -24,6 +25,7 @@ interface Student {
   section: string;
   registerNo: string;
   username: string;
+  mobileNumber?: string;
 }
 
 const AddStudent = () => {
@@ -36,6 +38,7 @@ const AddStudent = () => {
     registerNo: "",
     username: "",
     password: "",
+    mobileNumber: "",
     photo: null as File | null,
   });
   const [error, setError] = useState("");
@@ -96,6 +99,7 @@ const AddStudent = () => {
       formDataToSend.append("registerNo", existingStudent.registerNo);
       formDataToSend.append("username", formData.username);
       formDataToSend.append("password", formData.password);
+      formDataToSend.append("mobileNumber", formData.mobileNumber);
       if (formData.photo) {
         formDataToSend.append("photo", formData.photo);
       }
@@ -201,6 +205,13 @@ const AddStudent = () => {
                 label="Register Number"
                 name="registerNo"
                 placeholder="RVCE24BCS___"
+              />
+              <InputField
+                icon={Phone}
+                label="Mobile Number"
+                name="mobileNumber"
+                placeholder="10-digit mobile number"
+                required={false}
               />
               <InputField
                 icon={User}

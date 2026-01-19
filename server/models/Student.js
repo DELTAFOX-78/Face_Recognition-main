@@ -49,6 +49,17 @@ const studentSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   photo: { type: String, required: true },
+  mobileNumber: {
+    type: String,
+    required: false,  // Not required for backward compatibility with existing students
+    validate: {
+      validator: function (v) {
+        // Allow empty/null or validate 10-digit number
+        return !v || /^\d{10}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid 10-digit mobile number!`
+    }
+  },
   teachers: [
     {
       type: mongoose.Schema.Types.ObjectId,

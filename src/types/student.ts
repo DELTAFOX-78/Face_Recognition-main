@@ -8,4 +8,5 @@ export interface Student {
   username: string;
   photo: string;
   teacher: string;
+  mobileNumber?: string;
 }
