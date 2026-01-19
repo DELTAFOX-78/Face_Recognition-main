@@ -9,7 +9,7 @@ export const quizService = {
     },
 
     getClasses: async () => {
-        const response = await api.get<{ className: string, sections: string[] }[]>('/teacher/classes');
+        const response = await api.get<{ branch: string, classes: { className: string, sections: string[] }[] }[]>('/teacher/filter-options');
         return response.data;
     },
 

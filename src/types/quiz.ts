@@ -16,6 +16,7 @@ export interface QuizConfig {
 }
 
 export interface QuizAssignedTo {
+    branch: string;
     class: string;
     section: string;
 }

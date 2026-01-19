@@ -1,52 +1,102 @@
 [
     {
-        "question": "What is Serializability in the context of transactions?",
+        "question": "What is Serializability in the context of DBMS?",
         "options": [
-            "A) The concept used to determine whether a schedule with interleaving operations is correct",
-            "B) A type of operation that allows a transaction to retrieve data from the database",
-            "C) A way to permanently save a transaction's changes to the database",
-            "D) A method for undoing transactions"
+            "A) The concept of determining whether a schedule with interleaving operations is correct",
+            "B) The process of marking the start of a transaction",
+            "C) The type of scheduling that allows operations to overlap",
+            "D) The method of committing a transaction"
         ],
         "correct_answer": "A"
     },
     {
-        "question": "What happens when a schedule is serializable?",
+        "question": "What happens when a schedule with interleaving is serializable?",
         "options": [
-            "A) It produces different results from a non-serializable schedule",
-            "B) It allows the transaction to permanently save its changes to the database",
-            "C) It guarantees that operations from different transactions do not overlap",
-            "D) It ensures that operations from different transactions produce the same result"
-        ],
-        "correct_answer": "D"
-    },
-    {
-        "question": "What is the purpose of the END TRANSACTION operation?",
-        "options": [
-            "A) To commit a transaction's changes to the database",
-            "B) To mark the start of a transaction",
-            "C) To indicate the end of a transaction's operations",
-            "D) To undo a transaction's changes"
+            "A) It produces different results from serial schedules",
+            "B) It allows operations to overlap in various ways",
+            "C) It produces the same result as one of the serial schedules",
+            "D) It marks the end of a transaction"
         ],
         "correct_answer": "C"
     },
     {
-        "question": "What happens when a system decides that a transaction can be permanently saved to the database?",
+        "question": "What is marked at the start of a transaction?",
         "options": [
-            "A) It is committed and the transaction's changes are saved",
-            "B) It is aborted and the transaction's changes are undone",
-            "C) It is rolled back and the transaction's changes are discarded",
-            "D) It is delayed until a later time"
+            "A) The start of the transaction",
+            "B) The end of the transaction",
+            "C) The system's tracking of the transaction",
+            "D) The operation to be performed"
         ],
         "correct_answer": "A"
     },
     {
-        "question": "What type of schedule is non-serializable?",
+        "question": "What operations allow a transaction to access data?",
         "options": [
-            "A) Serializable",
-            "B) Non-serializable",
-            "C) Parallel",
-            "D) Concurrent"
+            "A) READ and WRITE",
+            "B) COMMIT and ABORT",
+            "C) BEGIN and END",
+            "D) READ only"
+        ],
+        "correct_answer": "A"
+    },
+    {
+        "question": "What is indicated at the end of a transaction?",
+        "options": [
+            "A) The start of a new transaction",
+            "B) The completion of a previous transaction",
+            "C) The system's tracking of the transaction",
+            "D) The operation to be performed"
+        ],
+        "correct_answer": "C"
+    },
+    {
+        "question": "What signals that a transaction has been successfully completed?",
+        "options": [
+            "A) COMMITTRANSACTION",
+            "B) ABORTTRANSACTION",
+            "C) BEGINTRANSACTION",
+            "D) ENDTRANSACTION"
+        ],
+        "correct_answer": "A"
+    },
+    {
+        "question": "What happens to a transaction's update when interleaving is used?",
+        "options": [
+            "A) The update is preserved",
+            "B) The update is lost",
+            "C) The update is not affected",
+            "D) The update is duplicated"
         ],
         "correct_answer": "B"
+    },
+    {
+        "question": "Why is Serializability important?",
+        "options": [
+            "A) To allow for overlapping operations",
+            "B) To ensure data consistency and accuracy",
+            "C) To reduce the complexity of transactions",
+            "D) To increase the speed of transaction execution"
+        ],
+        "correct_answer": "B"
+    },
+    {
+        "question": "What is an example of how Operations of T1 and T2 may overlap?",
+        "options": [
+            "A) T1 and T2 run sequentially",
+            "B) T1 and T2 are executed in parallel",
+            "C) The operations of T1 and T2 overlap as shown in Figure 21.5(c)",
+            "D) The operations of T1 and T2 never overlap"
+        ],
+        "correct_answer": "C"
+    },
+    {
+        "question": "What type of scheduling allows operations to overlap?",
+        "options": [
+            "A) Serial",
+            "B) Parallel",
+            "C) Non-serial (Interleaving)",
+            "D) Concurrent"
+        ],
+        "correct_answer": "C"
     }
 ]

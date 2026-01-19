@@ -23,14 +23,18 @@ const enrollmentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    subject: {
+        type: String,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
     },
 });
 
-// Compound unique index: one enrollment per teacher-student pair
-enrollmentSchema.index({ teacher: 1, student: 1 }, { unique: true });
+// Compound unique index: one enrollment per teacher-student-subject combination
+enrollmentSchema.index({ teacher: 1, student: 1, subject: 1 }, { unique: true });
 
 // Index for faster queries by teacher
 enrollmentSchema.index({ teacher: 1, class: 1, section: 1 });

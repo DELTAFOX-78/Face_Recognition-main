@@ -52,11 +52,26 @@ export const getStudentQuizzes = async (req, res) => {
             return res.status(404).json({ message: "Student not found" });
         }
 
-        // Find quizzes assigned to student's class and section
+        // Get all enrollments for this student
+        const Enrollment = (await import("../models/Enrollment.js")).default;
+        const enrollments = await Enrollment.find({ student: studentId });
+
+        if (enrollments.length === 0) {
+            // Student not enrolled in any classes
+            return res.json([]);
+        }
+
+        // Build query conditions for each enrollment
+        const enrollmentConditions = enrollments.map(enrollment => ({
+            "assignedTo.branch": enrollment.branch,
+            "assignedTo.class": enrollment.class,
+            "assignedTo.section": enrollment.section
+        }));
+
+        // Find quizzes that match any of the student's enrollments
         // And that are PUBLISHED or CLOSED (to see history)
         const quizzes = await Quiz.find({
-            "assignedTo.class": student.class,
-            "assignedTo.section": student.section,
+            $or: enrollmentConditions,
             status: { $in: ["PUBLISHED", "CLOSED"] }
         }).select("-questions.correctAnswer"); // Don't send correct answers
 

@@ -169,8 +169,20 @@ export const markAttendance = async (req, res) => {
         .json({ message: "Class and section are required" });
     }
 
-    const teacher = await Teacher.findById(req.user.id);
-    const sub = teacher.subject;
+    // Get the enrollment to find the subject being taught for this class/section
+    const enrollment = await Enrollment.findOne({
+      teacher: req.user.id,
+      class: className,
+      section: section,
+    });
+
+    if (!enrollment || !enrollment.subject) {
+      return res.status(400).json({
+        message: "No subject found for this class/section combination"
+      });
+    }
+
+    const sub = enrollment.subject;
 
     // Store current session info
     currentAttendanceSession = {
@@ -205,7 +217,6 @@ export const stopAttendance = async (req, res) => {
     }
 
     const teacherId = req.user.id;
-    const teacher = await Teacher.findById(teacherId);
 
     // Get enrollments for this teacher matching the current attendance session
     const enrollments = await Enrollment.find({
@@ -214,10 +225,19 @@ export const stopAttendance = async (req, res) => {
       section: currentAttendanceSession.section,
     }).populate('student');
 
+    if (enrollments.length === 0) {
+      return res.status(400).json({
+        message: "No students found for this class/section"
+      });
+    }
+
     // Get student IDs from enrollments
     const filteredStudents = enrollments.map(enrollment => enrollment.student._id);
 
-    const stopped = await stopPythonScript(filteredStudents, teacher.subject);
+    // Get subject from the first enrollment (they all have the same subject for this class/section)
+    const subject = enrollments[0].subject;
+
+    const stopped = await stopPythonScript(filteredStudents, subject);
 
     isCapturing = false;
     const sessionInfo = `${currentAttendanceSession.class} - Section ${currentAttendanceSession.section}`;
@@ -239,22 +259,31 @@ export const downloadAttendanceReport = async (req, res) => {
     const teacherId = req.user.id;
     const { date, branch, class: className, section } = req.query;
 
-    // Get all students for this teacher
-    const teacher = await Teacher.findById(teacherId).populate("students");
+    // Build enrollment query based on filters
+    const enrollmentQuery = { teacher: teacherId };
+    if (branch) enrollmentQuery.branch = branch;
+    if (className) enrollmentQuery.class = className;
+    if (section) enrollmentQuery.section = section;
 
-    // Filter students based on provided filters
-    let filteredStudents = teacher.students;
-    if (branch) {
-      filteredStudents = filteredStudents.filter(s => s.branch === branch);
-    }
-    if (className) {
-      filteredStudents = filteredStudents.filter(s => s.class === className);
-    }
-    if (section) {
-      filteredStudents = filteredStudents.filter(s => s.section === section);
-    }
+    // Get enrollments for this teacher with the specified filters
+    const enrollments = await Enrollment.find(enrollmentQuery).populate("student");
 
-    const studentIds = filteredStudents.map(s => s._id);
+    // Extract student IDs and create a map of enrollment data
+    const studentIds = enrollments.map(enrollment => enrollment.student._id);
+    const enrollmentMap = new Map();
+    enrollments.forEach(enrollment => {
+      enrollmentMap.set(enrollment.student._id.toString(), {
+        class: enrollment.class,
+        branch: enrollment.branch,
+        section: enrollment.section
+      });
+    });
+
+    if (studentIds.length === 0) {
+      // No students found for the given filters
+      const filePath = await generateAttendanceReport([], teacherId);
+      return res.download(filePath);
+    }
 
     // Get attendance records for filtered students
     const attendanceRecords = await Student.aggregate([
@@ -274,9 +303,6 @@ export const downloadAttendanceReport = async (req, res) => {
       {
         $project: {
           name: 1,
-          class: 1,
-          branch: 1,
-          section: 1,
           registerNo: 1,
           "attendance.date": 1,
           "attendance.subject": 1,
@@ -285,9 +311,20 @@ export const downloadAttendanceReport = async (req, res) => {
       },
     ]);
 
+    // Add enrollment-specific class/branch/section to each record
+    const enrichedRecords = attendanceRecords.map(record => {
+      const enrollmentData = enrollmentMap.get(record._id.toString());
+      return {
+        ...record,
+        class: enrollmentData?.class || '',
+        branch: enrollmentData?.branch || '',
+        section: enrollmentData?.section || ''
+      };
+    });
+
     // Generate Excel file
     const filePath = await generateAttendanceReport(
-      attendanceRecords,
+      enrichedRecords,
       teacherId
     );
 

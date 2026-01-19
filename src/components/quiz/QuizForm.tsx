@@ -11,6 +11,7 @@ export default function QuizForm() {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [branch, setBranch] = useState('');
     const [className, setClassName] = useState('');
     const [section, setSection] = useState('');
     const [timeLimit, setTimeLimit] = useState(30);
@@ -23,12 +24,16 @@ export default function QuizForm() {
     const [numQuestions, setNumQuestions] = useState(5);
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const { data: classes } = useQuery({
-        queryKey: ['teacherClasses'],
+    const { data: filterOptions } = useQuery({
+        queryKey: ['teacherFilterOptions'],
         queryFn: quizService.getClasses
     });
 
-    const availableSections = classes?.find(c => c.className === className)?.sections || [];
+    // Get available classes for selected branch
+    const availableClasses = filterOptions?.find(option => option.branch === branch)?.classes || [];
+
+    // Get available sections for selected class
+    const availableSections = availableClasses?.find(c => c.className === className)?.sections || [];
 
     const createMutation = useMutation({
         mutationFn: quizService.createQuiz,
@@ -88,7 +93,7 @@ export default function QuizForm() {
         e.preventDefault();
 
         // Validation
-        if (!title || !className || !section || !dueDate) {
+        if (!title || !branch || !className || !section || !dueDate) {
             return toast.error("Please fill all required fields");
         }
         if (questions.length === 0) {
@@ -98,7 +103,7 @@ export default function QuizForm() {
         const quizData: CreateQuizData = {
             title,
             description,
-            assignedTo: { class: className, section },
+            assignedTo: { branch, class: className, section },
             questions: questions as any,
             config: {
                 timeLimit,
@@ -137,6 +142,26 @@ export default function QuizForm() {
                         />
                     </div>
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Branch</label>
+                        <select
+                            value={branch}
+                            onChange={(e) => {
+                                setBranch(e.target.value);
+                                setClassName(''); // Reset class when branch changes
+                                setSection(''); // Reset section when branch changes
+                            }}
+                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
+                            required
+                        >
+                            <option value="">Select Branch</option>
+                            {filterOptions?.map((option) => (
+                                <option key={option.branch} value={option.branch}>
+                                    {option.branch}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
                         <select
                             value={className}
@@ -146,9 +171,10 @@ export default function QuizForm() {
                             }}
                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2 border"
                             required
+                            disabled={!branch}
                         >
                             <option value="">Select Class</option>
-                            {classes?.map((cls) => (
+                            {availableClasses?.map((cls) => (
                                 <option key={cls.className} value={cls.className}>
                                     {cls.className}
                                 </option>

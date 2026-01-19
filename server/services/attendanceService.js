@@ -7,6 +7,19 @@ export const attendanceService = {
       throw new Error("Student not found");
     }
 
+    // Get all enrollments with subjects
+    const Enrollment = (await import("../models/Enrollment.js")).default;
+    const enrollments = await Enrollment.find({ student: studentId });
+
+    console.log("=== ATTENDANCE SERVICE DEBUG ===");
+    console.log("Student ID:", studentId);
+    console.log("Number of enrollments found:", enrollments.length);
+    console.log("Enrollments:", JSON.stringify(enrollments, null, 2));
+
+    // Get all enrolled subjects from enrollments
+    const enrolledSubjects = enrollments.map((e) => e.subject);
+    console.log("Enrolled subjects:", enrolledSubjects);
+
     // Group attendance by subject
     const subjectAttendance = student.attendance.reduce((acc, record) => {
       if (!acc[record.subject]) {
@@ -23,13 +36,25 @@ export const attendanceService = {
       return acc;
     }, {});
 
+    console.log("Subject attendance before merge:", subjectAttendance);
+
+    // Add enrolled subjects with no attendance
+    enrolledSubjects.forEach((subject) => {
+      if (!subjectAttendance[subject]) {
+        subjectAttendance[subject] = { present: 0, total: 0 };
+      }
+    });
+
+    console.log("Subject attendance after merge:", subjectAttendance);
+    console.log("=== END DEBUG ===");
+
     // Calculate statistics
     const records = Object.entries(subjectAttendance).map(
       ([subject, stats]) => ({
         subject,
         present: stats.present,
         total: stats.total,
-        percentage: (stats.present / stats.total) * 100,
+        percentage: stats.total > 0 ? (stats.present / stats.total) * 100 : 0,
       })
     );
 

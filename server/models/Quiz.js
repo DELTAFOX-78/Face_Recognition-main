@@ -41,6 +41,10 @@ const quizSchema = new mongoose.Schema({
     type: String // Path to uploaded PDF/Text file
   },
   assignedTo: {
+    branch: {
+      type: String,
+      required: true
+    },
     class: {
       type: String,
       required: true
@@ -80,7 +84,7 @@ const quizSchema = new mongoose.Schema({
 
 // Indexes for faster queries
 quizSchema.index({ teacher: 1 });
-quizSchema.index({ "assignedTo.class": 1, "assignedTo.section": 1 });
+quizSchema.index({ "assignedTo.branch": 1, "assignedTo.class": 1, "assignedTo.section": 1 });
 quizSchema.index({ status: 1 });
 
 const Quiz = mongoose.model('Quiz', quizSchema);
