@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Teacher from "../models/Teacher.js";
 import Student from "../models/Student.js";
+import Enrollment from "../models/Enrollment.js";
 import { generateAttendanceReport } from "../services/excelService.js";
 import { io } from "../index.js";
 import {
@@ -49,14 +50,27 @@ export const addStudent = async (req, res) => {
 
     // Check if student with the given register number already exists
     let student = await Student.findOne({ registerNo });
+    let isNewStudent = false;
 
     if (student) {
+      // Student already exists - check if already enrolled with this teacher
+      const existingEnrollment = await Enrollment.findOne({
+        teacher: req.user.id,
+        student: student._id,
+      });
+
+      if (existingEnrollment) {
+        return res.status(400).json({
+          message: "Student is already enrolled in your class",
+        });
+      }
+
       // Ensure student.teachers is defined
       if (!student.teachers) {
         student.teachers = [];
       }
 
-      // Student already exists, add teacher reference if not already present
+      // Add teacher reference if not already present
       if (!student.teachers.includes(req.user.id)) {
         student.teachers.push(req.user.id);
         await student.save();
@@ -66,66 +80,66 @@ export const addStudent = async (req, res) => {
       await Teacher.findByIdAndUpdate(req.user.id, {
         $addToSet: { students: student._id },
       });
+    } else {
+      // Check if username already exists
+      const existingStudent = await Student.findOne({ username });
 
-      return res.status(200).json({
-        message: "Student already exists, added to your students list",
-        student: {
-          id: student._id,
-          name: student.name,
-          registerNo: student.registerNo,
-          photo: student.photo,
-          class: student.class,
-          branch: student.branch,
-          section: student.section,
-        },
-        exists: true,
+      if (existingStudent) {
+        return res.status(400).json({
+          message: "Username already exists",
+        });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create new student (keep class/branch/section for backward compatibility)
+      student = new Student({
+        name,
+        class: className,
+        branch,
+        section,
+        registerNo,
+        username,
+        password: hashedPassword,
+        photo,
+        teachers: [req.user.id],
+      });
+
+      await student.save();
+      isNewStudent = true;
+
+      // Add student to teacher's students array
+      await Teacher.findByIdAndUpdate(req.user.id, {
+        $push: { students: student._id },
       });
     }
 
-    // Check if username already exists
-    const existingStudent = await Student.findOne({ username });
-
-    if (existingStudent) {
-      return res.status(400).json({
-        message: "Username already exists",
-      });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new student
-    student = new Student({
-      name,
+    // Create enrollment for this teacher-student pair with specific class/section
+    const enrollment = new Enrollment({
+      teacher: req.user.id,
+      student: student._id,
       class: className,
       branch,
       section,
-      registerNo,
-      username,
-      password: hashedPassword,
-      photo,
-      teachers: [req.user.id],
     });
 
-    await student.save();
-
-    // Add student to teacher's students array
-    await Teacher.findByIdAndUpdate(req.user.id, {
-      $push: { students: student._id },
-    });
+    await enrollment.save();
 
     res.status(201).json({
-      message: "Student added successfully",
+      message: isNewStudent
+        ? "Student added successfully"
+        : "Existing student enrolled in your class successfully",
       student: {
         id: student._id,
         name: student.name,
         registerNo: student.registerNo,
         photo: student.photo,
-        class: student.class,
-        branch: student.branch,
-        section: student.section,
+        class: className,
+        branch: branch,
+        section: section,
       },
-      exists: false,
+      exists: !isNewStudent,
     });
   } catch (error) {
     console.error("Error adding student:", error);
@@ -190,15 +204,18 @@ export const stopAttendance = async (req, res) => {
       return res.status(400).json({ message: "No capture process running" });
     }
 
-    const teacher = await Teacher.findById(req.user.id).populate('students');
+    const teacherId = req.user.id;
+    const teacher = await Teacher.findById(teacherId);
 
-    // Filter students by the selected class and section
-    const filteredStudents = teacher.students
-      .filter(student =>
-        student.class === currentAttendanceSession.class &&
-        student.section === currentAttendanceSession.section
-      )
-      .map(student => student._id);
+    // Get enrollments for this teacher matching the current attendance session
+    const enrollments = await Enrollment.find({
+      teacher: teacherId,
+      class: currentAttendanceSession.class,
+      section: currentAttendanceSession.section,
+    }).populate('student');
+
+    // Get student IDs from enrollments
+    const filteredStudents = enrollments.map(enrollment => enrollment.student._id);
 
     const stopped = await stopPythonScript(filteredStudents, teacher.subject);
 
@@ -284,18 +301,43 @@ export const downloadAttendanceReport = async (req, res) => {
 
 export const getStudentById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
+    const teacherId = req.user.id;
+    const studentId = req.params.id;
+
+    const student = await Student.findById(studentId);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
-    res.json(student);
+
+    // Get the enrollment for this teacher-student pair
+    const enrollment = await Enrollment.findOne({
+      teacher: teacherId,
+      student: studentId,
+    });
+
+    // Return student with enrollment-specific class/section
+    res.json({
+      _id: student._id,
+      name: student.name,
+      registerNo: student.registerNo,
+      username: student.username,
+      photo: student.photo,
+      class: enrollment ? enrollment.class : student.class,
+      branch: enrollment ? enrollment.branch : student.branch,
+      section: enrollment ? enrollment.section : student.section,
+      attendance: student.attendance,
+      enrollmentId: enrollment ? enrollment._id : null,
+    });
   } catch (error) {
+    console.error("Error fetching student:", error);
     res.status(500).json({ message: "Error fetching student" });
   }
 };
 
 export const updateStudent = async (req, res) => {
   try {
+    const teacherId = req.user.id;
+    const studentId = req.params.id;
     const {
       name,
       class: className,
@@ -306,13 +348,11 @@ export const updateStudent = async (req, res) => {
       photo,
     } = req.body;
 
+    // Update student's basic info (name, registerNo, username, photo)
     const student = await Student.findByIdAndUpdate(
-      req.params.id,
+      studentId,
       {
         name,
-        class: className,
-        branch,
-        section,
         registerNo,
         username,
         photo: req.file ? req.file.filename : photo,
@@ -324,28 +364,68 @@ export const updateStudent = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    res.json(student);
+    // Update the enrollment for this teacher-student pair (class/branch/section)
+    const enrollment = await Enrollment.findOneAndUpdate(
+      { teacher: teacherId, student: studentId },
+      { class: className, branch, section },
+      { new: true }
+    );
+
+    // Return updated data with enrollment-specific values
+    res.json({
+      _id: student._id,
+      name: student.name,
+      registerNo: student.registerNo,
+      username: student.username,
+      photo: student.photo,
+      class: enrollment ? enrollment.class : className,
+      branch: enrollment ? enrollment.branch : branch,
+      section: enrollment ? enrollment.section : section,
+    });
   } catch (error) {
+    console.error("Error updating student:", error);
     res.status(500).json({ message: "Error updating student" });
   }
 };
 
 export const deleteStudent = async (req, res) => {
   try {
-    const student = await Student.findByIdAndDelete(req.params.id);
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    const teacherId = req.user.id;
+    const studentId = req.params.id;
+
+    // First, delete only the enrollment for this teacher-student pair
+    const enrollment = await Enrollment.findOneAndDelete({
+      teacher: teacherId,
+      student: studentId,
+    });
+
+    if (!enrollment) {
+      return res.status(404).json({ message: "Student not enrolled in your class" });
     }
 
-    // Remove student reference from teacher
-    await Teacher.updateMany(
-      { students: req.params.id },
-      { $pull: { students: req.params.id } }
-    );
+    // Remove student reference from this teacher's students array
+    await Teacher.findByIdAndUpdate(teacherId, {
+      $pull: { students: studentId },
+    });
 
-    res.json({ message: "Student deleted successfully" });
-    res.json({ message: "Student deleted successfully" });
+    // Remove this teacher from student's teachers array
+    await Student.findByIdAndUpdate(studentId, {
+      $pull: { teachers: teacherId },
+    });
+
+    // Check if student has any remaining enrollments
+    const remainingEnrollments = await Enrollment.countDocuments({ student: studentId });
+
+    // If no remaining enrollments, optionally delete the student entirely
+    // (Keeping for now - only deleting if student has no teachers left)
+    const student = await Student.findById(studentId);
+    if (student && (!student.teachers || student.teachers.length === 0)) {
+      await Student.findByIdAndDelete(studentId);
+    }
+
+    res.json({ message: "Student removed from your class successfully" });
   } catch (error) {
+    console.error("Error deleting student:", error);
     res.status(500).json({ message: "Error deleting student" });
   }
 };
@@ -353,22 +433,20 @@ export const deleteStudent = async (req, res) => {
 export const getTeacherClasses = async (req, res) => {
   try {
     const teacherId = req.user.id;
-    const teacher = await Teacher.findById(teacherId).populate('students', 'class section');
 
-    if (!teacher) {
-      return res.status(404).json({ message: "Teacher not found" });
-    }
+    // Get enrollments for this teacher
+    const enrollments = await Enrollment.find({ teacher: teacherId });
 
-    // Extract unique classes and sections
+    // Extract unique classes and sections from enrollments
     const uniqueClasses = [];
     const classMap = new Map(); // class -> Set(sections)
 
-    teacher.students.forEach(student => {
-      if (student.class && student.section) {
-        if (!classMap.has(student.class)) {
-          classMap.set(student.class, new Set());
+    enrollments.forEach(enrollment => {
+      if (enrollment.class && enrollment.section) {
+        if (!classMap.has(enrollment.class)) {
+          classMap.set(enrollment.class, new Set());
         }
-        classMap.get(student.class).add(student.section);
+        classMap.get(enrollment.class).add(enrollment.section);
       }
     });
 
@@ -393,25 +471,23 @@ export const getTeacherClasses = async (req, res) => {
 export const getTeacherBranchClassSection = async (req, res) => {
   try {
     const teacherId = req.user.id;
-    const teacher = await Teacher.findById(teacherId).populate('students', 'branch class section');
 
-    if (!teacher) {
-      return res.status(404).json({ message: "Teacher not found" });
-    }
+    // Get enrollments for this teacher
+    const enrollments = await Enrollment.find({ teacher: teacherId });
 
     // Build nested structure: branch -> class -> sections
     const branchMap = new Map(); // branch -> Map(class -> Set(sections))
 
-    teacher.students.forEach(student => {
-      if (student.branch && student.class && student.section) {
-        if (!branchMap.has(student.branch)) {
-          branchMap.set(student.branch, new Map());
+    enrollments.forEach(enrollment => {
+      if (enrollment.branch && enrollment.class && enrollment.section) {
+        if (!branchMap.has(enrollment.branch)) {
+          branchMap.set(enrollment.branch, new Map());
         }
-        const classMap = branchMap.get(student.branch);
-        if (!classMap.has(student.class)) {
-          classMap.set(student.class, new Set());
+        const classMap = branchMap.get(enrollment.branch);
+        if (!classMap.has(enrollment.class)) {
+          classMap.set(enrollment.class, new Set());
         }
-        classMap.get(student.class).add(student.section);
+        classMap.get(enrollment.class).add(enrollment.section);
       }
     });
 

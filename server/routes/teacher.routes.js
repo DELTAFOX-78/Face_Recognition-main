@@ -42,9 +42,30 @@ router.get("/filter-options", verifyToken, getTeacherBranchClassSection);
 // Add this new route to existing routes
 router.get("/students", verifyToken, async (req, res) => {
   try {
-    const teacher = await Teacher.findById(req.user.id).populate("students");
-    res.json({ students: teacher.students });
+    const teacherId = req.user.id;
+
+    // Get enrollments for this teacher with populated student data
+    const Enrollment = (await import("../models/Enrollment.js")).default;
+    const enrollments = await Enrollment.find({ teacher: teacherId }).populate("student");
+
+    // Map enrollments to student objects with teacher-specific class/section
+    const students = enrollments.map(enrollment => ({
+      _id: enrollment.student._id,
+      name: enrollment.student.name,
+      registerNo: enrollment.student.registerNo,
+      username: enrollment.student.username,
+      photo: enrollment.student.photo,
+      // Use enrollment-specific class/section (not student's global values)
+      class: enrollment.class,
+      branch: enrollment.branch,
+      section: enrollment.section,
+      attendance: enrollment.student.attendance,
+      enrollmentId: enrollment._id,
+    }));
+
+    res.json({ students });
   } catch (error) {
+    console.error("Error fetching students:", error);
     res.status(500).json({ message: "Error fetching students" });
   }
 });
