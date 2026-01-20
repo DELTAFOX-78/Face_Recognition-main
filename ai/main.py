@@ -88,6 +88,8 @@ while True:
     # Detect faces and compare with known faces
     face_locations = face_recognition.face_locations(small_frame)
     face_encodings = face_recognition.face_encodings(small_frame, face_locations)
+    
+    name = "Unknown"  # Initialize name to prevent NameError if no face found
 
 
     for face_encoding, face_location in zip(face_encodings, face_locations):

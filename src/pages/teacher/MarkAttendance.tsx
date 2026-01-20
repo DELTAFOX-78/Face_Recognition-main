@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import api from "../../utils/api";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
@@ -16,7 +16,7 @@ interface ClassInfo {
   sections: string[];
 }
 
-const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
+const LogItem = React.forwardRef<HTMLDivElement, LogItemProps>(({ message, type = "info" }, ref) => {
   const variants = {
     initial: {
       x: -20,
@@ -77,6 +77,7 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
 
   return (
     <motion.div
+      ref={ref}
       variants={variants}
       initial="initial"
       animate="animate"
@@ -104,7 +105,7 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
       )}
     </motion.div>
   );
-};
+});
 
 const MarkAttendance = () => {
   const [capturing, setCapturing] = useState(false);
