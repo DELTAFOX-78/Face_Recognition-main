@@ -1,101 +1,51 @@
 [
     {
-        "question": "What is Serializability in the context of DBMS?",
+        "question": "What is the primary focus of Unit 1 (Introduction to Database Systems) at RV College of Engineering?",
         "options": [
-            "A) The concept of determining whether a schedule with interleaving operations is correct",
-            "B) The process of marking the start of a transaction",
-            "C) The type of scheduling that allows operations to overlap",
-            "D) The method of committing a transaction"
-        ],
-        "correct_answer": "A"
-    },
-    {
-        "question": "What happens when a schedule with interleaving is serializable?",
-        "options": [
-            "A) It produces different results from serial schedules",
-            "B) It allows operations to overlap in various ways",
-            "C) It produces the same result as one of the serial schedules",
-            "D) It marks the end of a transaction"
-        ],
-        "correct_answer": "C"
-    },
-    {
-        "question": "What is marked at the start of a transaction?",
-        "options": [
-            "A) The start of the transaction",
-            "B) The end of the transaction",
-            "C) The system's tracking of the transaction",
-            "D) The operation to be performed"
-        ],
-        "correct_answer": "A"
-    },
-    {
-        "question": "What operations allow a transaction to access data?",
-        "options": [
-            "A) READ and WRITE",
-            "B) COMMIT and ABORT",
-            "C) BEGIN and END",
-            "D) READ only"
-        ],
-        "correct_answer": "A"
-    },
-    {
-        "question": "What is indicated at the end of a transaction?",
-        "options": [
-            "A) The start of a new transaction",
-            "B) The completion of a previous transaction",
-            "C) The system's tracking of the transaction",
-            "D) The operation to be performed"
-        ],
-        "correct_answer": "C"
-    },
-    {
-        "question": "What signals that a transaction has been successfully completed?",
-        "options": [
-            "A) COMMITTRANSACTION",
-            "B) ABORTTRANSACTION",
-            "C) BEGINTRANSACTION",
-            "D) ENDTRANSACTION"
-        ],
-        "correct_answer": "A"
-    },
-    {
-        "question": "What happens to a transaction's update when interleaving is used?",
-        "options": [
-            "A) The update is preserved",
-            "B) The update is lost",
-            "C) The update is not affected",
-            "D) The update is duplicated"
+            "A) Database security and management",
+            "B) Introduction to database systems and their applications",
+            "C) Advanced database programming languages",
+            "D) Database design and development methodologies"
         ],
         "correct_answer": "B"
     },
     {
-        "question": "Why is Serializability important?",
+        "question": "Which of the following is an example of a recent application of databases?",
         "options": [
-            "A) To allow for overlapping operations",
-            "B) To ensure data consistency and accuracy",
-            "C) To reduce the complexity of transactions",
-            "D) To increase the speed of transaction execution"
+            "A) Traditional banking systems",
+            "B) Multimedia databases",
+            "C) Geographic Information Systems (GIS)",
+            "D) All of the above are examples of recent database applications"
         ],
-        "correct_answer": "B"
+        "correct_answer": "D"
     },
     {
-        "question": "What is an example of how Operations of T1 and T2 may overlap?",
+        "question": "What type of database is used for storing and managing large amounts of historical data?",
         "options": [
-            "A) T1 and T2 run sequentially",
-            "B) T1 and T2 are executed in parallel",
-            "C) The operations of T1 and T2 overlap as shown in Figure 21.5(c)",
-            "D) The operations of T1 and T2 never overlap"
+            "A) Real-time databases",
+            "B) Multimedia databases",
+            "C) Data warehouses",
+            "D) Geographic Information Systems (GIS)"
         ],
         "correct_answer": "C"
     },
     {
-        "question": "What type of scheduling allows operations to overlap?",
+        "question": "Which database language is used for building interactive applications?",
         "options": [
-            "A) Serial",
-            "B) Parallel",
-            "C) Non-serial (Interleaving)",
-            "D) Concurrent"
+            "A) SQL",
+            "B) Java",
+            "C) Go",
+            "D) Python"
+        ],
+        "correct_answer": "C"
+    },
+    {
+        "question": "What is the primary function of a database schema?",
+        "options": [
+            "A) To manage and update data",
+            "B) To store and retrieve data",
+            "C) To design and organize database structure",
+            "D) To perform complex database queries"
         ],
         "correct_answer": "C"
     }
