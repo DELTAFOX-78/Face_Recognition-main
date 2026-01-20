@@ -1,165 +1,211 @@
 # 🎓 AI-Powered Automatic Attendance System
 
-An intelligent, automated attendance management system that leverages face recognition technology and anti-spoofing detection to streamline attendance tracking for educational institutions.
+<div align="center">
+
+An intelligent, automated attendance management system that leverages **face recognition technology** and **anti-spoofing detection** to streamline attendance tracking for educational institutions.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen)
 ![Python](https://img.shields.io/badge/python-%3E%3D3.9-blue)
 ![React](https://img.shields.io/badge/react-18.3.1-61dafb)
+![MongoDB](https://img.shields.io/badge/mongodb-8.1.3-47A248)
+
+</div>
+
+---
 
 ## 📋 Table of Contents
 
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [System Architecture](#system-architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
-- [License](#license)
+- [Features](#-features)
+- [Tech Stack](#️-tech-stack)
+- [System Architecture](#️-system-architecture)
+- [Screenshots](#-screenshots)
+- [Prerequisites](#-prerequisites)
+- [Installation](#-installation)
+- [Configuration](#️-configuration)
+- [Usage](#-usage)
+- [Project Structure](#-project-structure)
+- [API Documentation](#-api-documentation)
+- [Security Features](#-security-features)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
 
 ## ✨ Features
 
 ### 🔐 Authentication & Authorization
-- Secure login system for teachers and students
-- JWT-based authentication
-- Role-based access control (Teacher/Student)
+- **Secure login system** for teachers and students
+- **JWT-based authentication** with token refresh
+- **Role-based access control** (Teacher/Student)
+- Password hashing with Bcrypt
 
 ### 👤 Face Recognition Attendance
 - **Real-time face detection** using OpenCV and face_recognition library
 - **Anti-spoofing detection** powered by YOLO model to prevent photo/video fraud
-- **Automated attendance marking** with confidence threshold
+- **Automated attendance marking** with confidence threshold (5 consecutive detections required)
 - **Live video feed** with visual feedback for recognition status
-- Section-based attendance filtering (Class, Branch, Section)
+- **Section-based attendance filtering** (Branch, Class, Section)
+- **Activity logging** with real-time status updates
 
-### 📊 Student Management
-- Multi-teacher enrollment system (students can be enrolled with multiple teachers)
-- Enrollment-based student tracking
+### 📊 Multi-Teacher Enrollment System
+- Students can be enrolled with **multiple teachers** across different subjects
+- **Enrollment-based student tracking** for accurate management
 - Student profile management with photo uploads
-- Bulk student import capability
+- Independent associations per teacher (no data overwrites)
 
-### 📈 Attendance Analytics
-- Real-time attendance tracking dashboard
+### 📈 Attendance Analytics & Reporting
+- **Real-time attendance tracking dashboard**
 - Date-wise and subject-wise attendance reports
-- **Automated Excel report generation** with customizable filters
+- **Automated Excel report generation** with customizable filters (Date, Branch, Class, Section)
 - **Scheduled attendance reports** via cron jobs
 - Attendance statistics and visualizations
 
 ### 📝 Quiz & Assessment Module (QuizCrafter)
-- AI-powered quiz generation using Google Gemini API
+- **AI-powered quiz generation** using Google Gemini API
+- **Configurable question count** set by teachers
 - Manual quiz creation with customizable questions
 - Multiple-choice quiz support
-- Student quiz submission and grading
-- Quiz results and analytics
+- Student quiz submission and automatic grading
+- **Quiz results with answer review** showing correct answers
 - PDF text extraction for quiz generation
+- Quiz publishing to specific branches/classes/sections
 
 ### 📢 Announcements & Communication
-- Teacher-to-student announcements
-- Real-time chat system using Socket.IO
+- **Teacher-to-student announcements**
+- Real-time chat system using **Socket.IO**
 - Branch/Class/Section-specific announcements
-- Notification system
+- Notification system for students
 
 ### 📅 Additional Features
 - Automated daily attendance report scheduling
 - Export attendance data to Excel
-- Beautiful, responsive UI with Framer Motion animations
+- Beautiful, responsive UI with **Framer Motion** animations
 - Dark mode support via Tailwind CSS
+- Student dashboard with personal attendance statistics
+
+---
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18.3.1** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **Framer Motion** for animations
-- **React Router** for navigation
-- **Axios** for API calls
-- **Socket.IO Client** for real-time communication
-- **Zustand** for state management
-- **React Webcam** for camera access
-- **ExcelJS** for report generation
+| Technology | Purpose |
+|------------|---------|
+| **React 18.3.1** | UI Framework with TypeScript |
+| **Vite** | Fast development and building |
+| **Tailwind CSS** | Styling and dark mode |
+| **Framer Motion** | Smooth animations |
+| **React Router** | Navigation |
+| **Axios** | API calls |
+| **Socket.IO Client** | Real-time communication |
+| **Zustand** | State management |
+| **React Webcam** | Camera access |
+| **ExcelJS** | Report generation |
 
 ### Backend
-- **Node.js** with Express.js
-- **MongoDB** with Mongoose ODM
-- **Socket.IO** for WebSocket communication
-- **JWT** for authentication
-- **Multer** for file uploads
-- **Node-cron** for scheduled tasks
-- **Bcrypt** for password hashing
+| Technology | Purpose |
+|------------|---------|
+| **Node.js** | Runtime environment |
+| **Express.js** | Web framework |
+| **MongoDB** | Database with Mongoose ODM |
+| **Socket.IO** | WebSocket communication |
+| **JWT** | Authentication |
+| **Multer** | File uploads |
+| **Node-cron** | Scheduled tasks |
+| **Bcrypt** | Password hashing |
 
 ### AI & Machine Learning
-- **Python 3.9+**
-- **OpenCV** (cv2) for computer vision
-- **face_recognition** library for facial recognition
-- **YOLO (Ultralytics)** for anti-spoofing detection
-- **NumPy** for numerical operations
-- **Google Gemini API** for AI-powered quiz generation
+| Technology | Purpose |
+|------------|---------|
+| **Python 3.9+** | AI processing |
+| **OpenCV (cv2)** | Computer vision |
+| **face_recognition** | Facial recognition |
+| **YOLO (Ultralytics)** | Anti-spoofing detection |
+| **NumPy** | Numerical operations |
+| **Google Gemini API** | AI-powered quiz generation |
 
 ### QuizCrafter Module
-- **FastAPI** (Python backend)
-- **React** with Vite (Frontend)
-- **MongoDB** for quiz storage
-- **PDF parsing** for text extraction
+| Technology | Purpose |
+|------------|---------|
+| **FastAPI** | Python backend |
+| **LangChain** | AI orchestration |
+| **PyMuPDF** | PDF parsing |
+| **React + Vite** | Frontend |
+
+---
 
 ## 🏗️ System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Client (React + TypeScript)              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   Teacher    │  │   Student    │  │  QuizCrafter │     │
-│  │  Dashboard   │  │  Dashboard   │  │    Module    │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-                            ↕ HTTP/WebSocket
-┌─────────────────────────────────────────────────────────────┐
-│                  Backend (Node.js + Express)                │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │     Auth     │  │  Attendance  │  │     Quiz     │     │
-│  │   Service    │  │   Service    │  │   Service    │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-                            ↕
-┌─────────────────────────────────────────────────────────────┐
-│              AI Engine (Python + OpenCV)                    │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │     Face     │  │    YOLO      │  │    Gemini    │     │
-│  │ Recognition  │  │Anti-Spoofing │  │  Quiz Gen    │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-└─────────────────────────────────────────────────────────────┘
-                            ↕
-┌─────────────────────────────────────────────────────────────┐
-│                    Database (MongoDB)                       │
-│    Students | Teachers | Attendance | Quizzes | Chats      │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    Client (React + TypeScript)                  │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐       │
+│  │    Teacher    │  │    Student    │  │   QuizCrafter │       │
+│  │   Dashboard   │  │   Dashboard   │  │     Module    │       │
+│  │  • Attendance │  │  • View Stats │  │  • AI Quizzes │       │
+│  │  • Students   │  │  • Take Quiz  │  │  • PDF Upload │       │
+│  │  • Quizzes    │  │  • Announce.  │  └───────────────┘       │
+│  └───────────────┘  └───────────────┘                          │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ HTTP / WebSocket
+┌────────────────────────────▼────────────────────────────────────┐
+│                  Backend (Node.js + Express)                    │
+│  ┌──────────┐  ┌──────────────┐  ┌─────────┐  ┌───────────┐    │
+│  │   Auth   │  │  Attendance  │  │  Quiz   │  │ Announce. │    │
+│  │ Service  │  │   Service    │  │ Service │  │  Service  │    │
+│  └──────────┘  └──────────────┘  └─────────┘  └───────────┘    │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│              AI Engine (Python + OpenCV)                        │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐       │
+│  │     Face      │  │     YOLO      │  │    Gemini     │       │
+│  │  Recognition  │  │ Anti-Spoofing │  │   Quiz Gen    │       │
+│  │  • Encodings  │  │  • Fake/Real  │  │  • AI MCQs    │       │
+│  └───────────────┘  └───────────────┘  └───────────────┘       │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│                    Database (MongoDB)                           │
+│  ┌──────────┐ ┌──────────┐ ┌────────────┐ ┌───────────────────┐│
+│  │ Students │ │ Teachers │ │ Enrollment │ │ Quizzes/Announce. ││
+│  └──────────┘ └──────────┘ └────────────┘ └───────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 📸 Screenshots
+
+> Add screenshots of your application here for better documentation.
+
+<!-- 
+Example:
+![Login Page](./screenshots/login.png)
+![Teacher Dashboard](./screenshots/teacher-dashboard.png)
+![Face Recognition](./screenshots/face-recognition.png)
+-->
+
+---
 
 ## 📦 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** (v16.0.0 or higher)
-- **Python** (v3.9 or higher)
-- **MongoDB** (v4.4 or higher)
-- **Webcam** for face recognition
-- **Git** for version control
-
-### Python Dependencies
-- OpenCV (`cv2`)
-- face_recognition
-- ultralytics (YOLO)
-- numpy
-- FastAPI (for QuizCrafter)
-- uvicorn
+| Requirement | Version |
+|-------------|---------|
+| **Node.js** | v16.0.0 or higher |
+| **Python** | v3.9 or higher |
+| **MongoDB** | v4.4 or higher |
+| **Git** | Latest |
+| **Webcam** | Minimum 720p |
 
 ### Hardware Requirements
-- Webcam (minimum 720p recommended)
-- Minimum 4GB RAM
-- GPU recommended for faster YOLO inference (optional)
+- **Webcam**: Minimum 720p recommended
+- **RAM**: Minimum 4GB (8GB recommended)
+- **GPU**: Optional (for faster YOLO inference)
+
+---
 
 ## 🚀 Installation
 
@@ -174,14 +220,7 @@ cd Face_Recognition-main
 npm install
 ```
 
-### 3. Install Backend Dependencies
-```bash
-cd server
-npm install
-cd ..
-```
-
-### 4. Set Up Python Environment
+### 3. Set Up Python Environment
 ```bash
 cd ai
 python -m venv venv
@@ -193,11 +232,12 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Install Python dependencies
-pip install opencv-python face_recognition ultralytics numpy torch
+pip install opencv-python face_recognition ultralytics numpy torch cvzone
+
 cd ..
 ```
 
-### 5. Set Up QuizCrafter Module
+### 4. Set Up QuizCrafter Module
 ```bash
 cd QuizCrafter/backend
 pip install -r requirements.txt
@@ -207,17 +247,17 @@ npm install
 cd ../..
 ```
 
-### 6. Download YOLO Model
+### 5. Download YOLO Model
 - Place the YOLO anti-spoofing model (`best.pt`) in the `ai/models/` directory
 - Ensure you have the trained face encodings in `ai/encodings.npz`
 
-### 7. Configure Environment Variables
+### 6. Configure Environment Variables
 
 Create a `.env` file in the root directory:
 
 ```env
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/attendance_system
+VITE_MONGODB_URI=mongodb://localhost:27017/attendance_system
 
 # JWT Secret
 JWT_SECRET=your_jwt_secret_key_here
@@ -230,15 +270,17 @@ CLIENT_URL=http://localhost:5173
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-Create a `.env` file in the `server/` directory with the same content.
+Create a `.env` file in the `server/` directory with similar configuration.
+
+---
 
 ## ⚙️ Configuration
 
 ### Generate Face Encodings
 
-Before using the face recognition system, you need to generate encodings for registered students:
+Before using the face recognition system, generate encodings for registered students:
 
-1. Place student photos in the designated folder (ensure proper naming convention)
+1. Add student photos through the teacher dashboard (photo upload during student registration)
 2. Run the encoding generator:
 
 ```bash
@@ -246,122 +288,157 @@ cd ai
 python EncodeGenerator.py
 ```
 
-This will create an `encodings.npz` file containing face encodings.
+This creates an `encodings.npz` file containing face encodings for all registered students.
+
+---
 
 ## 🎯 Usage
 
-### Start the Application
+### Start All Services
 
 You need to run multiple services simultaneously:
 
-#### 1. Start MongoDB
+#### Terminal 1: MongoDB
 ```bash
-# Make sure MongoDB is running
 mongod
 ```
 
-#### 2. Start Backend Server
+#### Terminal 2: Backend Server
 ```bash
 cd server
 node index.js
 ```
+> Server runs at http://localhost:3000
 
-#### 3. Start Frontend Development Server
+#### Terminal 3: Frontend Development Server
 ```bash
-# In the root directory
 npm run dev
 ```
+> Frontend runs at http://localhost:5173
 
-#### 4. Start QuizCrafter Backend (Optional)
+#### Terminal 4: QuizCrafter Backend (Optional)
 ```bash
 cd QuizCrafter/backend
 uvicorn main:app --reload
 ```
+> QuizCrafter API runs at http://localhost:8000
 
-#### 5. Start QuizCrafter Frontend (Optional)
+#### Terminal 5: QuizCrafter Frontend (Optional)
 ```bash
 cd QuizCrafter/frontend
 npm run dev
 ```
+> QuizCrafter UI runs at http://localhost:5174
 
-The application will be available at:
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:3000
-- **QuizCrafter Backend**: http://localhost:8000
-- **QuizCrafter Frontend**: http://localhost:5174
+### Access Points
 
-### Default Access
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:3000 |
+| QuizCrafter Backend | http://localhost:8000 |
+| QuizCrafter Frontend | http://localhost:5174 |
 
-#### Teacher Login
-- Create a teacher account through the registration page
-- Login to access teacher dashboard
-- Features: Start attendance, view reports, manage students, create quizzes
+### User Workflows
 
-#### Student Login
-- Students are registered by teachers
-- Use provided credentials to login
-- Features: View attendance, take quizzes, receive announcements
+#### 👩‍🏫 Teacher Workflow
+1. **Register/Login** through the teacher portal
+2. **Add Students** with photos (Branch, Class, Section, Subject)
+3. **Start Attendance** - Select class, branch, section to begin face recognition
+4. **View Reports** - Download Excel reports with date/branch/class filters
+5. **Create Quizzes** - Manually or using AI (Gemini) with PDF uploads
+6. **Publish Announcements** - Send messages to specific student groups
+
+#### 👨‍🎓 Student Workflow
+1. **Login** with credentials provided by teacher
+2. **View Dashboard** - Check personal attendance statistics
+3. **Take Quizzes** - Attempt published quizzes
+4. **View Results** - See quiz scores and correct answers
+5. **Read Announcements** - Get updates from teachers
+
+---
 
 ## 📁 Project Structure
 
 ```
 Face_Recognition-main/
-├── ai/                           # Python AI module
-│   ├── main.py                  # Face recognition script
-│   ├── EncodeGenerator.py       # Generate face encodings
-│   ├── generate_quiz.py         # AI quiz generation
-│   ├── encodings.npz            # Stored face encodings
-│   ├── models/                  # YOLO anti-spoofing model
-│   └── background.png           # UI background for camera feed
+├── 📂 ai/                           # Python AI module
+│   ├── main.py                      # Face recognition + anti-spoofing script
+│   ├── EncodeGenerator.py           # Generate face encodings
+│   ├── generate_quiz.py             # AI quiz generation helper
+│   ├── encodings.npz                # Stored face encodings
+│   ├── background.png               # UI background for camera feed
+│   └── 📂 models/
+│       └── best.pt                  # YOLO anti-spoofing model
 │
-├── server/                       # Node.js backend
-│   ├── index.js                 # Express server entry point
-│   ├── controllers/             # Route controllers
-│   ├── models/                  # MongoDB schemas
-│   │   ├── Student.js
-│   │   ├── Teacher.js
-│   │   ├── Enrollment.js
-│   │   ├── Quiz.js
-│   │   ├── Announcement.js
-│   │   └── Chat.js
-│   ├── routes/                  # API routes
-│   ├── middleware/              # Auth & Socket middleware
-│   ├── services/                # Business logic
-│   ├── utils/                   # Helper functions
-│   ├── cron/                    # Scheduled tasks
-│   ├── uploads/                 # Student photos
-│   └── reports/                 # Generated Excel reports
+├── 📂 server/                        # Node.js backend
+│   ├── index.js                     # Express server entry point
+│   ├── 📂 controllers/
+│   │   ├── teacher.controller.js    # Student/Attendance management
+│   │   ├── auth.controller.js       # Authentication logic
+│   │   ├── quizController.js        # Quiz CRUD operations
+│   │   ├── announcement.controller.js # Announcements
+│   │   └── ...
+│   ├── 📂 models/
+│   │   ├── Student.js               # Student schema
+│   │   ├── Teacher.js               # Teacher schema
+│   │   ├── Enrollment.js            # Multi-teacher enrollment
+│   │   ├── Quiz.js                  # Quiz schema
+│   │   ├── QuizSubmission.js        # Quiz answers
+│   │   ├── Announcement.js          # Announcements
+│   │   └── Chat.js                  # Chat messages
+│   ├── 📂 routes/                   # API route definitions
+│   ├── 📂 middleware/               # Auth & Socket middleware
+│   ├── 📂 services/                 # Business logic
+│   ├── 📂 utils/                    # Helper functions
+│   ├── 📂 cron/                     # Scheduled tasks
+│   └── 📂 uploads/                  # Student photos
 │
-├── src/                          # React frontend
-│   ├── components/              # Reusable components
-│   ├── pages/                   # Page components
-│   │   ├── teacher/             # Teacher pages
-│   │   └── student/             # Student pages
-│   ├── services/                # API services
-│   ├── stores/                  # Zustand stores
-│   ├── types/                   # TypeScript types
-│   ├── utils/                   # Utility functions
-│   ├── routes/                  # Route definitions
-│   └── App.tsx                  # Main app component
+├── 📂 src/                           # React frontend
+│   ├── App.tsx                      # Main app component
+│   ├── 📂 components/               # Reusable UI components
+│   ├── 📂 pages/
+│   │   ├── LandingPage.tsx          # Home page
+│   │   ├── 📂 teacher/
+│   │   │   ├── TeacherDashboard.tsx
+│   │   │   ├── MarkAttendance.tsx   # Face recognition UI
+│   │   │   ├── AddStudent.tsx
+│   │   │   ├── ViewStudents.tsx
+│   │   │   ├── CreateQuiz.tsx
+│   │   │   ├── QuizSubmissions.tsx
+│   │   │   └── TeacherAnnouncements.tsx
+│   │   └── 📂 student/
+│   │       ├── StudentDashboard.tsx
+│   │       ├── StudentQuizList.tsx
+│   │       ├── TakeQuiz.tsx
+│   │       ├── QuizResult.tsx
+│   │       └── StudentAnnouncements.tsx
+│   ├── 📂 services/                 # API service functions
+│   ├── 📂 stores/                   # Zustand state stores
+│   ├── 📂 types/                    # TypeScript types
+│   └── 📂 utils/                    # Utility functions
 │
-├── QuizCrafter/                 # Quiz generation module
-│   ├── backend/                 # FastAPI backend
-│   │   ├── main.py
-│   │   └── requirements.txt
-│   └── frontend/                # React frontend
-│       └── src/
+├── 📂 QuizCrafter/                   # AI Quiz generation module
+│   ├── 📂 backend/
+│   │   ├── main.py                  # FastAPI server
+│   │   └── requirements.txt         # Python dependencies
+│   └── 📂 frontend/
+│       └── src/                     # React frontend
 │
-├── package.json                 # Frontend dependencies
-├── vite.config.ts              # Vite configuration
-├── tailwind.config.js          # Tailwind CSS config
-└── tsconfig.json               # TypeScript config
+├── package.json                     # Frontend dependencies
+├── vite.config.ts                   # Vite configuration
+├── tailwind.config.js               # Tailwind CSS config
+├── tsconfig.json                    # TypeScript config
+└── README.md                        # This file
 ```
+
+---
 
 ## 📡 API Documentation
 
 ### Authentication Endpoints
 
-#### POST `/api/auth/register`
+#### `POST /api/auth/register`
 Register a new teacher account
 ```json
 {
@@ -371,7 +448,7 @@ Register a new teacher account
 }
 ```
 
-#### POST `/api/auth/login`
+#### `POST /api/auth/login`
 Login for teachers and students
 ```json
 {
@@ -382,92 +459,108 @@ Login for teachers and students
 
 ### Attendance Endpoints
 
-#### POST `/api/teacher/start-attendance`
-Start attendance session for a specific class/section
-
-#### POST `/api/teacher/stop-attendance`
-Stop ongoing attendance session
-
-#### GET `/api/attendance/report`
-Generate attendance report with filters (date, branch, class, section)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/teacher/start-attendance` | Start attendance session |
+| `POST` | `/api/teacher/stop-attendance` | Stop ongoing session |
+| `GET` | `/api/attendance/report` | Generate filtered report |
 
 ### Student Management
 
-#### POST `/api/teacher/add-student`
-Add a new student with enrollment details
-
-#### GET `/api/teacher/students`
-Get all students for the logged-in teacher
-
-#### PUT `/api/teacher/update-student/:id`
-Update student information
-
-#### DELETE `/api/teacher/delete-student/:id`
-Delete a student
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/teacher/add-student` | Add student with enrollment |
+| `GET` | `/api/teacher/students` | Get all teacher's students |
+| `PUT` | `/api/teacher/update-student/:id` | Update student info |
+| `DELETE` | `/api/teacher/delete-student/:id` | Delete student |
+| `GET` | `/api/teacher/classes` | Get teacher's classes |
+| `GET` | `/api/teacher/branch-class-section` | Get enrollment details |
 
 ### Quiz Endpoints
 
-#### POST `/api/quiz/create`
-Create a new quiz (manual or AI-generated)
-
-#### POST `/api/quiz/publish/:id`
-Publish a quiz to students
-
-#### POST `/api/quiz/submit`
-Submit quiz answers
-
-#### GET `/api/quiz/student/:studentId`
-Get all quizzes for a student
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/quiz/create` | Create quiz (manual/AI) |
+| `POST` | `/api/quiz/publish/:id` | Publish to students |
+| `POST` | `/api/quiz/submit` | Submit quiz answers |
+| `GET` | `/api/quiz/student/:studentId` | Get student's quizzes |
 
 ### Announcement Endpoints
 
-#### POST `/api/announcement/create`
-Create a new announcement
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/announcement/create` | Create announcement |
+| `GET` | `/api/announcement/student` | Get student announcements |
 
-#### GET `/api/announcement/student`
-Get announcements for a student
+---
 
 ## 🔒 Security Features
 
-- **Password Hashing**: Bcrypt for secure password storage
-- **JWT Authentication**: Secure token-based authentication
-- **Anti-Spoofing**: YOLO model prevents photo/video fraud
-- **Confidence Threshold**: Multiple consecutive detections required
-- **Role-Based Access**: Separate teacher and student permissions
+| Feature | Description |
+|---------|-------------|
+| **Password Hashing** | Bcrypt for secure password storage |
+| **JWT Authentication** | Secure token-based authentication |
+| **Anti-Spoofing** | YOLO model prevents photo/video fraud |
+| **Confidence Threshold** | 5 consecutive detections required for attendance |
+| **Role-Based Access** | Separate teacher and student permissions |
+| **Enrollment Isolation** | Multi-teacher enrollments are independent |
+
+---
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
 
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
+1. **Fork** the repository
+2. **Create** a new branch (`git checkout -b feature/YourFeature`)
+3. **Commit** your changes (`git commit -m 'Add some feature'`)
+4. **Push** to the branch (`git push origin feature/YourFeature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+- Follow existing code style
+- Write meaningful commit messages
+- Test your changes thoroughly
+- Update documentation if needed
+
+---
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
 
 ## 👨‍💻 Author
 
 **DELTAFOX-78**
 
-- GitHub: [@DELTAFOX-78](https://github.com/DELTAFOX-78)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/DELTAFOX-78)
+
+---
 
 ## 🙏 Acknowledgments
 
-- **face_recognition** library by Adam Geitgey
-- **Ultralytics YOLO** for anti-spoofing detection
-- **Google Gemini API** for AI-powered quiz generation
-- **OpenCV** community for computer vision tools
+- **[face_recognition](https://github.com/ageitgey/face_recognition)** library by Adam Geitgey
+- **[Ultralytics YOLO](https://github.com/ultralytics/ultralytics)** for anti-spoofing detection
+- **[Google Gemini API](https://ai.google.dev/)** for AI-powered quiz generation
+- **[OpenCV](https://opencv.org/)** community for computer vision tools
+- **[LangChain](https://www.langchain.com/)** for AI orchestration
+
+---
 
 ## 📞 Support
 
-For issues, questions, or suggestions, please open an issue on GitHub or contact the repository owner.
+For issues, questions, or suggestions:
+- 📧 Open an issue on GitHub
+- ⭐ Star this repo if you find it useful
 
 ---
 
 <div align="center">
   <strong>⭐ If you find this project useful, please consider giving it a star! ⭐</strong>
+  
+  <br><br>
+  
+  Made with ❤️ for educational institutions
 </div>

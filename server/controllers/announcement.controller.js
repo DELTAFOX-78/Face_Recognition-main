@@ -1,6 +1,7 @@
 import Announcement from '../models/Announcement.js';
 import Student from '../models/Student.js';
 import Teacher from '../models/Teacher.js';
+import Enrollment from '../models/Enrollment.js';
 
 // Teacher: Create a new announcement
 export const createAnnouncement = async (req, res) => {
@@ -120,7 +121,7 @@ export const getTeacherBranchClassSection = async (req, res) => {
     }
 };
 
-// Student: Get announcements for student's branch/class/section
+// Student: Get announcements for student's enrolled classes/sections
 export const getStudentAnnouncements = async (req, res) => {
     try {
         const student = await Student.findById(req.user.id);
@@ -129,10 +130,37 @@ export const getStudentAnnouncements = async (req, res) => {
             return res.status(404).json({ message: 'Student not found' });
         }
 
-        const announcements = await Announcement.find({
+        // Get all enrollments for this student
+        const enrollments = await Enrollment.find({ student: req.user.id });
+
+        // Build query conditions for all enrolled branch/class/section combinations
+        const enrollmentConditions = enrollments.map(enrollment => ({
+            branch: enrollment.branch,
+            class: enrollment.class,
+            section: enrollment.section
+        }));
+
+        // Also include the student's primary branch/class/section as fallback
+        enrollmentConditions.push({
             branch: student.branch,
             class: student.class,
             section: student.section
+        });
+
+        // Remove duplicate conditions
+        const uniqueConditions = [];
+        const seen = new Set();
+        for (const condition of enrollmentConditions) {
+            const key = `${condition.branch}-${condition.class}-${condition.section}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueConditions.push(condition);
+            }
+        }
+
+        // Find announcements matching any of the student's enrollments
+        const announcements = await Announcement.find({
+            $or: uniqueConditions
         })
             .sort({ createdAt: -1 })
             .lean();
@@ -158,12 +186,38 @@ export const replyToAnnouncement = async (req, res) => {
             return res.status(404).json({ message: 'Student not found' });
         }
 
-        // Verify the announcement is targeted at the student's branch/class/section
-        const announcement = await Announcement.findOne({
-            _id: req.params.id,
+        // Get all enrollments for this student
+        const enrollments = await Enrollment.find({ student: req.user.id });
+
+        // Build conditions for all enrolled branch/class/section combinations
+        const enrollmentConditions = enrollments.map(enrollment => ({
+            branch: enrollment.branch,
+            class: enrollment.class,
+            section: enrollment.section
+        }));
+
+        // Include the student's primary branch/class/section as fallback
+        enrollmentConditions.push({
             branch: student.branch,
             class: student.class,
             section: student.section
+        });
+
+        // Remove duplicate conditions
+        const uniqueConditions = [];
+        const seen = new Set();
+        for (const condition of enrollmentConditions) {
+            const key = `${condition.branch}-${condition.class}-${condition.section}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueConditions.push(condition);
+            }
+        }
+
+        // Verify the announcement is targeted at one of the student's enrolled sections
+        const announcement = await Announcement.findOne({
+            _id: req.params.id,
+            $or: uniqueConditions
         });
 
         if (!announcement) {
