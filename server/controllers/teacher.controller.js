@@ -4,7 +4,7 @@ import Teacher from "../models/Teacher.js";
 import Student from "../models/Student.js";
 import Enrollment from "../models/Enrollment.js";
 import { generateAttendanceReport } from "../services/excelService.js";
-import { io } from "../index.js";
+import { getIO } from "../utils/socket.js";
 import {
   runPythonScripts,
   stopPythonScript,
@@ -124,6 +124,7 @@ export const addStudent = async (req, res) => {
       class: className,
       branch,
       section,
+      subject: className, // Use class as the subject (DBMS, AIML, OS, etc.)
     });
 
     await enrollment.save();
@@ -194,15 +195,15 @@ export const markAttendance = async (req, res) => {
     };
 
     isCapturing = true;
-    io.emit("capture-status", { capturing: true });
+    getIO().emit("capture-status", { capturing: true });
 
     // Start process in background
     runPythonScripts(sub).catch((error) => {
       console.error("Error in Python process:", error);
       isCapturing = false;
       currentAttendanceSession = { class: null, section: null };
-      io.emit("error", error.message);
-      io.emit("capture-status", { capturing: false });
+      getIO().emit("error", error.message);
+      getIO().emit("capture-status", { capturing: false });
     });
 
     res.json({ message: `Attendance capture started for ${className} - Section ${section}` });
@@ -246,7 +247,7 @@ export const stopAttendance = async (req, res) => {
     const sessionInfo = `${currentAttendanceSession.class} - Section ${currentAttendanceSession.section}`;
     currentAttendanceSession = { class: null, section: null };
 
-    io.emit("capture-status", { capturing: false });
+    getIO().emit("capture-status", { capturing: false });
     res.json({
       message: stopped
         ? `Capture stopped successfully for ${sessionInfo}`
@@ -386,9 +387,17 @@ export const updateStudent = async (req, res) => {
       section,
       registerNo,
       username,
-      photo,
       mobileNumber,
     } = req.body;
+
+    // First, get the existing student to retain current photo if no new one uploaded
+    const existingStudent = await Student.findById(studentId);
+    if (!existingStudent) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Determine the photo path - use new file if uploaded, otherwise keep existing
+    const photoPath = req.file ? req.file.path : existingStudent.photo;
 
     // Update student's basic info (name, registerNo, username, photo, mobileNumber)
     const student = await Student.findByIdAndUpdate(
@@ -397,20 +406,16 @@ export const updateStudent = async (req, res) => {
         name,
         registerNo,
         username,
-        photo: req.file ? req.file.filename : photo,
+        photo: photoPath,
         mobileNumber,
       },
       { new: true }
     );
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-
-    // Update the enrollment for this teacher-student pair (class/branch/section)
+    // Update the enrollment for this teacher-student pair (class/branch/section/subject)
     const enrollment = await Enrollment.findOneAndUpdate(
       { teacher: teacherId, student: studentId },
-      { class: className, branch, section },
+      { class: className, branch, section, subject: className },
       { new: true }
     );
 

@@ -119,40 +119,8 @@ const AddStudent = () => {
     }
   };
 
-  const InputField = ({
-    icon: Icon,
-    label,
-    name,
-    type = "text",
-    placeholder,
-    required = true
-  }: {
-    icon: React.ElementType;
-    label: string;
-    name: string;
-    type?: string;
-    placeholder: string;
-    required?: boolean;
-  }) => (
-    <div className="space-y-2">
-      <label className="block text-sm font-semibold text-gray-700">
-        {label}
-      </label>
-      <div className="relative group">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Icon className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
-        </div>
-        <input
-          type={type}
-          name={name}
-          required={required}
-          className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
-          placeholder={placeholder}
-          onChange={handleChange}
-        />
-      </div>
-    </div>
-  );
+
+
 
   return (
     <DashboardLayout>
@@ -176,56 +144,156 @@ const AddStudent = () => {
         <div className="glass-card p-8 animate-fade-in">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField
-                icon={User}
-                label="Full Name"
-                name="name"
-                placeholder="John Doe"
-              />
-              <InputField
-                icon={BookOpen}
-                label="Class"
-                name="class"
-                placeholder="1st Year, 2nd Year, etc."
-              />
-              <InputField
-                icon={BookOpen}
-                label="Branch"
-                name="branch"
-                placeholder="CSE, ECE, MECH, etc."
-              />
-              <InputField
-                icon={Users}
-                label="Section"
-                name="section"
-                placeholder="A"
-              />
-              <InputField
-                icon={Hash}
-                label="Register Number"
-                name="registerNo"
-                placeholder="RVCE24BCS___"
-              />
-              <InputField
-                icon={Phone}
-                label="Mobile Number"
-                name="mobileNumber"
-                placeholder="10-digit mobile number"
-                required={false}
-              />
-              <InputField
-                icon={User}
-                label="Username"
-                name="username"
-                placeholder="johndoe"
-              />
-              <InputField
-                icon={Lock}
-                label="Password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-              />
+              {/* Full Name */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Full Name</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="John Doe"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Class */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Class</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <BookOpen className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="class"
+                    value={formData.class}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="1st Year, 2nd Year, etc."
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Branch */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Branch</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <BookOpen className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="branch"
+                    value={formData.branch}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="CSE, ECE, MECH, etc."
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Section */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Section</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Users className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="section"
+                    value={formData.section}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="A"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Register Number */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Register Number</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Hash className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="registerNo"
+                    value={formData.registerNo}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="RVCE24BCS___"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Mobile Number */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Mobile Number</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="mobileNumber"
+                    value={formData.mobileNumber}
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="10-digit mobile number"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Username */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Username</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="johndoe"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">Password</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors duration-200" />
+                  </div>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    required
+                    className="pl-12 block w-full px-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white/80 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+                    placeholder="••••••••"
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Photo Upload Section */}

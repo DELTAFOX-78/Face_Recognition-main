@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./utils/db.js";
 import { scheduleAttendanceReports } from "./cron/attendanceReport.js";
 import { attachSocketIO } from "./middleware/socketMiddleware.js";
+import { initSocket } from "./utils/socket.js";
 import authRoutes from "./routes/auth.routes.js";
 import studentRoutes from "./routes/student.routes.js";
 import teacherRoutes from "./routes/teacher.routes.js";
@@ -40,6 +41,9 @@ app.use("/reports", express.static("reports"));
 
 // Attach Socket.IO to request object - IMPORTANT: This must come before routes
 app.use(attachSocketIO(io));
+
+// Initialize Socket module
+initSocket(io);
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -77,4 +81,3 @@ httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-export { io };

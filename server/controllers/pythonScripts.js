@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 import Student from "../models/Student.js";
-import { io } from "../index.js";
+import { getIO } from "../utils/socket.js";
 import { sendAttendanceSMS } from "../services/smsService.js";
 
 let pythonProcess = null;
@@ -32,7 +32,7 @@ async function executePythonScript(scriptPath, processOutput = false, sub) {
           const student = await Student.findOne({ registerNo: output });
           if (student) {
             present_students.push(student._id.toString());
-            io.emit(
+            getIO().emit(
               "attendance-update",
               `Attendance marked as Present for: ${student.name}`
             );
@@ -100,14 +100,14 @@ async function executePythonScript(scriptPath, processOutput = false, sub) {
       );
 
       if (!shouldIgnore && errorMsg.length <= 100 && errorMsg.trim().length > 0) {
-        io.emit("error", errorMsg);
+        getIO().emit("error", errorMsg);
       }
     });
 
     pythonProcess.on("close", (code) => {
       if (count == 1) {
         // Use 'status-update' instead of 'process-ended' to avoid disabling Stop button
-        io.emit("status-update", `Images Loaded Successfully`);
+        getIO().emit("status-update", `Images Loaded Successfully`);
       }
 
       pythonProcess = null;
@@ -142,9 +142,9 @@ export const stopPythonScript = async (students, sub) => {
               present: false,
             });
             await student.save();
-            io.emit(
-              "process-ended",
-              `Attendance marked as Absent for: ${student.name}`
+            getIO().emit(
+              "attendance-update",
+              `Marked absent for: ${student.name}`
             );
 
             // Send SMS notification for absent attendance
@@ -169,13 +169,15 @@ export const stopPythonScript = async (students, sub) => {
     return true;
   } catch (error) {
     console.error("Error in stopPythonScript:", error);
-    io.emit("error", "Error processing absent students");
+    getIO().emit("error", "Error processing absent students");
     throw error;
   }
 };
 
 export const runPythonScripts = async (sub) => {
   try {
+    // Reset count for new session
+    count = 0;
     // Run EncodeGenerator.py silently
 
     await executePythonScript("ai/EncodeGenerator.py", false);

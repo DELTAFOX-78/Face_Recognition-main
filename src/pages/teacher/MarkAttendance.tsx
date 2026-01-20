@@ -8,7 +8,7 @@ import { showNotification } from "../../utils/notification/notification.ts";
 
 interface LogItemProps {
   message: string;
-  type: "success" | "error" | "info";
+  type: "success" | "warning" | "error" | "info";
 }
 
 interface ClassInfo {
@@ -40,6 +40,8 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
     switch (type) {
       case "success":
         return "bg-emerald-50/80 border-emerald-500 backdrop-blur-sm";
+      case "warning":
+        return "bg-orange-50/80 border-orange-500 backdrop-blur-sm";
       case "error":
         return "bg-red-50/80 border-red-500 backdrop-blur-sm";
       default:
@@ -51,6 +53,8 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
     switch (type) {
       case "success":
         return <Check className="w-5 h-5 text-emerald-500" />;
+      case "warning":
+        return <AlertCircle className="w-5 h-5 text-orange-500" />;
       case "error":
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       default:
@@ -62,6 +66,8 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
     switch (type) {
       case "success":
         return "text-emerald-700";
+      case "warning":
+        return "text-orange-700";
       case "error":
         return "text-red-700";
       default:
@@ -83,11 +89,14 @@ const LogItem: React.FC<LogItemProps> = ({ message, type = "info" }) => {
           {message}
         </span>
       </div>
-      {type === "success" && (
+      {(type === "success" || type === "warning") && (
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="flex items-center px-3 py-1 text-xs font-semibold text-emerald-700 bg-emerald-100 rounded-full"
+          className={`flex items-center px-3 py-1 text-xs font-semibold rounded-full ${type === "warning"
+            ? "text-orange-700 bg-orange-100"
+            : "text-emerald-700 bg-emerald-100"
+            }`}
         >
           <Check className="w-3 h-3 mr-1" />
           Marked
@@ -101,7 +110,7 @@ const MarkAttendance = () => {
   const [capturing, setCapturing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [logs, setLogs] = useState<
-    Array<{ message: string; type: "success" | "error" | "info" }>
+    Array<{ message: string; type: "success" | "warning" | "error" | "info" }>
   >([]);
   const logsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -146,29 +155,41 @@ const MarkAttendance = () => {
   }, [logs]);
 
   useEffect(() => {
-    const socket = io("http://localhost:3000");
+    const socket = io("http://localhost:3000", {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    socket.on("connect", () => {
+      console.log("Socket connected:", socket.id);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Socket disconnected");
+    });
 
     socket.on("attendance-update", (message) => {
+      console.log("Received attendance-update:", message);
+      // Detect if message is about absent student and use warning (orange) type
+      const isAbsent = message.toLowerCase().includes("absent");
       setLogs((prev) => [
         ...prev,
         {
           message: message,
-          type: "success",
+          type: isAbsent ? "warning" : "success",
         },
       ]);
     });
 
+    // Silently log errors to console but don't show in Activity Log
     socket.on("error", (error) => {
-      setLogs((prev) => [
-        ...prev,
-        {
-          message: error,
-          type: "error",
-        },
-      ]);
+      console.log("Received error (hidden):", error);
     });
 
     socket.on("process-ended", (message) => {
+      console.log("Received process-ended:", message);
       setLogs((prev) => [
         ...prev,
         {
@@ -181,6 +202,7 @@ const MarkAttendance = () => {
 
     // Status updates that don't stop the capturing process
     socket.on("status-update", (message) => {
+      console.log("Received status-update:", message);
       setLogs((prev) => [
         ...prev,
         {
@@ -291,8 +313,8 @@ const MarkAttendance = () => {
               onClick={capture}
               disabled={!canStartAttendance}
               className={`flex-1 flex items-center justify-center space-x-2 py-4 px-6 rounded-xl font-semibold text-white transition-all duration-300 ${canStartAttendance
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-300/40 hover:shadow-xl hover:shadow-indigo-300/50 transform hover:scale-[1.02]"
-                  : "bg-gray-300 cursor-not-allowed"
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-300/40 hover:shadow-xl hover:shadow-indigo-300/50 transform hover:scale-[1.02]"
+                : "bg-gray-300 cursor-not-allowed"
                 }`}
             >
               <Play className="h-5 w-5" />
@@ -302,8 +324,8 @@ const MarkAttendance = () => {
               onClick={stopCapture}
               disabled={!capturing}
               className={`flex-1 flex items-center justify-center space-x-2 py-4 px-6 rounded-xl font-semibold text-white transition-all duration-300 ${capturing
-                  ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 shadow-lg shadow-red-300/40 hover:shadow-xl hover:shadow-red-300/50 transform hover:scale-[1.02]"
-                  : "bg-gray-300 cursor-not-allowed"
+                ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 shadow-lg shadow-red-300/40 hover:shadow-xl hover:shadow-red-300/50 transform hover:scale-[1.02]"
+                : "bg-gray-300 cursor-not-allowed"
                 }`}
             >
               <Square className="h-5 w-5" />
@@ -353,8 +375,8 @@ const MarkAttendance = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={`mt-6 p-4 rounded-xl font-medium ${result.includes("Failed")
-                  ? "bg-red-50 text-red-700 border border-red-200"
-                  : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-200"
                 }`}
             >
               {result}
